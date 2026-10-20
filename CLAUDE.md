@@ -13,7 +13,7 @@ Sitio público bilingüe (es/en) con proyectos y experiencia laboral, formulario
 
 ## Entorno
 
-Windows + PowerShell, Node 24 LTS, PostgreSQL 18 local (base `portfolio_dev`). Todo debe funcionar en Windows.
+Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y `portfolio_test`). Todo debe funcionar en Windows.
 
 ## Ramas
 
@@ -38,7 +38,14 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 18 local (base `portfolio_dev`). T
 
 **Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet.
 
-**Datos** (Fase 1, aún no implementado): 13 tablas — admin_users, profile, project_categories, projects, experiences, technologies, project_technologies, experience_technologies, images, project_images, experience_images, social_links, contact_messages. Todo texto visible lleva columnas `_es` y `_en`; publicar exige ambos completos. CASCADE en tablas puente e imágenes asociadas; RESTRICT al borrar categoría o tecnología en uso. Los mensajes de contacto se guardan primero y el email se envía después (`email_status`).
+**Datos** (Fase 1, hecho): esquema en `server/prisma/schema.prisma`, 13 tablas — admin_users, profile, project_categories, projects, experiences, technologies, project_technologies, experience_technologies, images, project_images, experience_images, social_links, contact_messages. Todo texto visible lleva columnas `_es` y `_en` (nombres de tecnologías y empresas: una sola columna). Publicar exige ambos idiomas completos y no vacíos (CHECK en la base). Los CHECK, el singleton de `profile` y el índice parcial de portada están escritos a mano al final de la migración init: Prisma no los modela, así que revisar siempre el SQL de cada migración nueva (la prueba de la Fase 1 confirmó que Prisma no los elimina).
+
+- **Desactivación lógica**: `projects` y `experiences` no se borran nunca; tienen `deactivated_at` (independiente de `status`). El service expone solo `deactivate` y `reactivate`. El repository aplica `deactivated_at IS NULL` en toda lectura pública y en el listado por defecto del panel. El slug es único incluyendo desactivados.
+- **Borrado real**: solo `contact_messages`. Categorías y tecnologías únicamente si no están en uso (RESTRICT, contando proyectos desactivados).
+- **Imágenes (se implementa en la Fase 4)**: una imagen se elimina solo al quitarla de un proyecto o experiencia. El service, en una transacción, borra el vínculo y la fila de `images` si queda sin vínculos; después, fuera de la transacción, borra el archivo en Cloudinary. Si Cloudinary falla, se registra el error y no se revierte nada.
+- **API de contenido (Fase 3)**: no existe DELETE de proyectos ni experiencias; son `PATCH .../deactivate` y `PATCH .../reactivate`.
+- Los mensajes de contacto se guardan primero y el email se envía después (`email_status`).
+- Tests de base: usan `TEST_DATABASE_URL` (el nombre debe terminar en `_test`; los tests vacían las tablas).
 
 ## Convenciones
 
@@ -59,6 +66,9 @@ npm run lint       # ESLint
 npm run format     # Prettier (escribe)
 npm test           # Vitest en los workspaces
 npm run build      # build de ambos
+npm run db:migrate -w server   # crea/aplica migraciones en portfolio_dev
+npm run db:seed -w server      # admin + profile iniciales
+npm run db:generate -w server  # regenera el cliente Prisma (src/generated, ignorado por git)
 ```
 
 ## Fases

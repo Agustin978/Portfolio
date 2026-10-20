@@ -6,7 +6,7 @@ Portfolio personal bilingüe (es/en) con panel de administración. Monorepo con 
 
 - Node 24 LTS y npm
 - Git
-- PostgreSQL 18 local con una base `portfolio_dev` (se usa desde la Fase 1)
+- PostgreSQL 17 local con dos bases vacías: `portfolio_dev` y `portfolio_test`
 
 ## Puesta en marcha (PowerShell)
 
@@ -24,7 +24,23 @@ PORT=4000
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
-El resto de las variables se usan en fases posteriores.
+Para la base de datos (Fase 1):
+
+```
+DATABASE_URL=postgresql://USUARIO:CLAVE@localhost:5432/portfolio_dev
+TEST_DATABASE_URL=postgresql://USUARIO:CLAVE@localhost:5432/portfolio_test
+ADMIN_EMAIL=tu-email
+ADMIN_PASSWORD=al-menos-12-caracteres
+```
+
+El resto de las variables se usan en fases posteriores. Después aplicá el esquema y cargá el admin:
+
+```powershell
+npm run db:migrate -w server
+npm run db:seed -w server
+```
+
+`npm test` necesita `TEST_DATABASE_URL`: el nombre de la base debe terminar en `_test` porque los tests la vacían. Las migraciones se aplican solas antes de correr.
 
 ```powershell
 npm run dev
