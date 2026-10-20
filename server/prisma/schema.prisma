@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Prisma 7: the connection URL lives in prisma.config.ts, not here.
+datasource db {
+  provider = "postgresql"
+}
+
+enum PublishStatus {
+  draft
+  published
+
+  @@map("publish_status")
+}
+
+enum EmailStatus {
+  pending
+  sent
+  failed
+
+  @@map("email_status")
+}
+
+enum SkillGroup {
+  development
+  data
+  infrastructure
+  other
+
+  @@map("skill_group")
+}
+
+enum ContactLang {
+  es
+  en
+
+  @@map("contact_lang")
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("admin_users")
+}
+
+// Singleton: a CHECK (id = 1) in the init migration keeps it to one row.
+model Profile {
+  id             Int      @id @default(1)
+  fullName       String   @map("full_name")
+  location       String?
+  publicEmail    String?  @map("public_email")
+  cvUrlEs        String?  @map("cv_url_es")
+  cvUrlEn        String?  @map("cv_url_en")
+  roleEs         String?  @map("role_es")
+  roleEn         String?  @map("role_en")
+  headlineEs     String?  @map("headline_es")
+  headlineEn     String?  @map("headline_en")
+  introEs        String?  @map("intro_es")
+  introEn        String?  @map("intro_en")
+  bioEs          String?  @map("bio_es")
+  bioEn          String?  @map("bio_en")
+  availabilityEs String?  @map("availability_es")
+  availabilityEn String?  @map("availability_en")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("profile")
+}
+
+model ProjectCategory {
+  id        Int       @id @default(autoincrement())
+  slug      String    @unique
+  nameEs    String    @map("name_es")
+  nameEn    String    @map("name_en")
+  sortOrder Int       @default(0) @map("sort_order")
+  projects  Project[]
+
+  @@map("project_categories")
+}
+
+model Project {
+  id            Int                 @id @default(autoincrement())
+  slug          String              @unique // unique across deactivated rows too
+  categoryId    Int                 @map("category_id")
+  titleEs       String?             @map("title_es")
+  titleEn       String?             @map("title_en")
+  summaryEs     String?             @map("summary_es")
+  summaryEn     String?             @map("summary_en")
+  descriptionEs String?             @map("description_es")
+  descriptionEn String?             @map("description_en")
+  repoUrl       String?             @map("repo_url")
+  liveUrl       String?             @map("live_url")
+  startedAt     DateTime?           @map("started_at") @db.Date
+  endedAt       DateTime?           @map("ended_at") @db.Date
+  status        PublishStatus       @default(draft)
+  isFeatured    Boolean             @default(false) @map("is_featured")
+  sortOrder     Int                 @default(0) @map("sort_order")
+  publishedAt   DateTime?           @map("published_at") @db.Timestamptz(3)
+  // Soft delete, independent from status: projects are never physically deleted.
+  deactivatedAt DateTime?           @map("deactivated_at") @db.Timestamptz(3)
+  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+  category      ProjectCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  technologies  ProjectTechnology[]
+  images        ProjectImage[]
+
+  @@index([status, sortOrder])
+  @@index([categoryId])
+  @@map("projects")
+}
+
+model Experience {
+  id            Int                    @id @default(autoincrement())
+  company       String
+  companyUrl    String?                @map("company_url")
+  location      String?
+  roleEs        String?                @map("role_es")
+  roleEn        String?                @map("role_en")
+  descriptionEs String?                @map("description_es")
+  descriptionEn String?                @map("description_en")
+  startDate     DateTime               @map("start_date") @db.Date
+  endDate       DateTime?              @map("end_date") @db.Date // null = current position
+  status        PublishStatus          @default(draft)
+  sortOrder     Int                    @default(0) @map("sort_order")
+  deactivatedAt DateTime?              @map("deactivated_at") @db.Timestamptz(3)
+  createdAt     DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  technologies  ExperienceTechnology[]
+  images        ExperienceImage[]
+
+  @@index([status, startDate])
+  @@map("experiences")
+}
+
+model Technology {
+  id           Int                    @id @default(autoincrement())
+  slug         String                 @unique
+  name         String
+  skillGroup   SkillGroup             @default(other) @map("skill_group")
+  showInSkills Boolean                @default(false) @map("show_in_skills")
+  sortOrder    Int                    @default(0) @map("sort_order")
+  projects     ProjectTechnology[]
+  experiences  ExperienceTechnology[]
+
+  @@map("technologies")
+}
+
+model ProjectTechnology {
+  projectId    Int        @map("project_id")
+  technologyId Int        @map("technology_id")
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Restrict)
+
+  @@id([projectId, technologyId])
+  @@index([technologyId])
+  @@map("project_technologies")
+}
+
+model ExperienceTechnology {
+  experienceId Int        @map("experience_id")
+  technologyId Int        @map("technology_id")
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Restrict)
+
+  @@id([experienceId, technologyId])
+  @@index([technologyId])
+  @@map("experience_technologies")
+}
+
+model Image {
+  id                 Int               @id @default(autoincrement())
+  cloudinaryPublicId String            @unique @map("cloudinary_public_id")
+  url                String
+  width              Int
+  height             Int
+  altEs              String?           @map("alt_es")
+  altEn              String?           @map("alt_en")
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  projectLinks       ProjectImage[]
+  experienceLinks    ExperienceImage[]
+
+  @@map("images")
+}
+
+model ProjectImage {
+  projectId Int     @map("project_id")
+  imageId   Int     @map("image_id")
+  sortOrder Int     @default(0) @map("sort_order")
+  // One cover per project: partial unique index added by hand in the init migration.
+  isCover   Boolean @default(false) @map("is_cover")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  image     Image   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, imageId])
+  @@index([imageId])
+  @@map("project_images")
+}
+
+model ExperienceImage {
+  experienceId Int        @map("experience_id")
+  imageId      Int        @map("image_id")
+  sortOrder    Int        @default(0) @map("sort_order")
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  image        Image      @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, imageId])
+  @@index([imageId])
+  @@map("experience_images")
+}
+
+model SocialLink {
+  id        Int     @id @default(autoincrement())
+  platform  String  @unique // icon key: github, linkedin, ...
+  url       String
+  isVisible Boolean @default(true) @map("is_visible")
+  sortOrder Int     @default(0) @map("sort_order")
+
+  @@map("social_links")
+}
+
+model ContactMessage {
+  id          Int         @id @default(autoincrement())
+  name        String
+  email       String
+  message     String
+  lang        ContactLang @default(es)
+  emailStatus EmailStatus @default(pending) @map("email_status")
+  emailError  String?     @map("email_error")
+  sentAt      DateTime?   @map("sent_at") @db.Timestamptz(3)
+  isRead      Boolean     @default(false) @map("is_read")
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([createdAt])
+  @@map("contact_messages")
+}
