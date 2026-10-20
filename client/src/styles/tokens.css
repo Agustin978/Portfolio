@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+/* Design tokens; Tailwind 4 exposes them as utilities (bg-bg, text-muted, rounded-card, ...). */
+@theme {
+  --color-bg: #fafaf9;
+  --color-fg: #18181b;
+  --color-muted: #52525b;
+  --color-border: #e4e4e7;
+  --color-accent: #0f766e;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+
+  --container-page: 1040px;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
