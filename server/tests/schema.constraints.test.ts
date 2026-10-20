@@ -44,6 +44,21 @@ describe('publish CHECK constraints', () => {
     await expect(createProject(db, categoryId, { titleEs: 'Solo español' })).resolves.toBeTruthy();
   });
 
+  it('rejects publishing an experience with a NULL English role', async () => {
+    await expect(
+      db.experience.create({
+        data: {
+          company: 'Acme',
+          startDate: new Date('2022-01-01'),
+          roleEs: 'Dev',
+          descriptionEs: 'x',
+          descriptionEn: 'x',
+          status: 'published',
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
   it('rejects publishing an experience with a blank English role', async () => {
     await expect(
       db.experience.create({
