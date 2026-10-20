@@ -76,3 +76,15 @@ npm run db:generate -w server  # regenera el cliente Prisma (src/generated, igno
 0 base del monorepo · 1 datos · 2 autenticación · 3 API de contenido · 4 imágenes · 5 contacto · 6 sitio público · 7 panel de administración · 8 cierre (SEO, accesibilidad, tests) · 9 despliegue.
 
 No adelantar fases: al terminar cada una, resumir y frenar.
+
+## Estado actual y próximos pasos
+
+_Última actualización: 2026-10-20._
+
+- Fase 0: hecha y fusionada en `dev`.
+- Fase 1 (rama `feature/database-schema`): esquema, migraciones `init` y `fix_publish_checks`, repositories/services de projects y experiences, seed y tests (28 pasan). Pendiente de PR hacia `dev`.
+- Pendiente para cerrar la Fase 1: correr `npm run db:seed -w server` en `portfolio_dev` (requiere `ADMIN_PASSWORD` de 12+ caracteres en `.env`).
+- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example`, crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
+- Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
+- Siguiente: Fase 2 (autenticación: jsonwebtoken y express-rate-limit). Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Diferido: borrado de imágenes con Cloudinary (Fase 4), tal como se describe en la sección Datos.
