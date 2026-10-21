@@ -80,7 +80,9 @@ describe('experiences service', () => {
   });
 
   it('offers no way to physically delete an experience', () => {
-    expect(Object.keys(build())).toEqual(['deactivate', 'reactivate']);
-    expect(Object.keys(createExperiencesRepository(db))).not.toContain('delete');
+    for (const name of ['delete', 'remove', 'destroy']) {
+      expect(Object.keys(build())).not.toContain(name);
+      expect(Object.keys(createExperiencesRepository(db))).not.toContain(name);
+    }
   });
 });

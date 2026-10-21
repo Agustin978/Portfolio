@@ -12,6 +12,8 @@ const adminSelect = {
   _count: { select: { projects: true, experiences: true } },
 } as const;
 
+const skillSelect = { slug: true, name: true, skillGroup: true } as const;
+
 const ORDER = [{ sortOrder: 'asc' }, { id: 'asc' }] as const;
 
 export type SkillGroupValue = 'development' | 'data' | 'infrastructure' | 'other';
@@ -31,6 +33,13 @@ const slugTaken = () =>
 const notFound = () => new AppError(404, 'TECHNOLOGY_NOT_FOUND', 'Technology not found');
 
 export const createTechnologiesRepository = (db: PrismaClient) => ({
+  findForSkills: () =>
+    db.technology.findMany({
+      where: { showInSkills: true },
+      select: skillSelect,
+      orderBy: [...ORDER],
+    }),
+
   findAll: () => db.technology.findMany({ select: adminSelect, orderBy: [...ORDER] }),
 
   findById: (id: number) => db.technology.findUnique({ where: { id }, select: adminSelect }),

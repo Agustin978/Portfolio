@@ -23,6 +23,13 @@ import {
   createProfilePublicRouter,
 } from './modules/profile/profile.routes.js';
 import { createProfileService } from './modules/profile/profile.service.js';
+import { createProjectsController } from './modules/projects/projects.controller.js';
+import { createProjectsRepository } from './modules/projects/projects.repository.js';
+import {
+  createProjectsAdminRouter,
+  createProjectsPublicRouter,
+} from './modules/projects/projects.routes.js';
+import { createProjectsService } from './modules/projects/projects.service.js';
 import { createSocialLinksController } from './modules/social-links/social-links.controller.js';
 import { createSocialLinksRepository } from './modules/social-links/social-links.repository.js';
 import {
@@ -32,8 +39,18 @@ import {
 import { createSocialLinksService } from './modules/social-links/social-links.service.js';
 import { createTechnologiesController } from './modules/technologies/technologies.controller.js';
 import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
-import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
+import {
+  createSkillsPublicRouter,
+  createTechnologiesAdminRouter,
+} from './modules/technologies/technologies.routes.js';
 import { createTechnologiesService } from './modules/technologies/technologies.service.js';
+import { createExperiencesController } from './modules/experiences/experiences.controller.js';
+import { createExperiencesRepository } from './modules/experiences/experiences.repository.js';
+import {
+  createExperiencesAdminRouter,
+  createExperiencesPublicRouter,
+} from './modules/experiences/experiences.routes.js';
+import { createExperiencesService } from './modules/experiences/experiences.service.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { getPrisma } from './shared/db/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
@@ -73,18 +90,29 @@ const profileController = createProfileController(
 const socialLinksController = createSocialLinksController(
   createSocialLinksService(createSocialLinksRepository(getPrisma())),
 );
+const projectsController = createProjectsController(
+  createProjectsService(createProjectsRepository(getPrisma())),
+);
+const experiencesController = createExperiencesController(
+  createExperiencesService(createExperiencesRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
+  { path: '/experiences', router: createExperiencesAdminRouter(experiencesController) },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
+  { path: '/projects', router: createProjectsAdminRouter(projectsController) },
   { path: '/social-links', router: createSocialLinksAdminRouter(socialLinksController) },
   { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
 
 app.use('/api/v1/health', healthRouter);
+app.use('/api/v1/experiences', createExperiencesPublicRouter(experiencesController));
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
+app.use('/api/v1/skills', createSkillsPublicRouter(technologiesController));
 app.use('/api/v1/social-links', createSocialLinksPublicRouter(socialLinksController));
+app.use('/api/v1/projects', createProjectsPublicRouter(projectsController));
 app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));
 app.use(
   '/api/v1/auth',
