@@ -15,6 +15,9 @@ export default defineConfig({
       NODE_ENV: 'test',
       PORT: '4000',
       CLIENT_ORIGIN: 'http://localhost:5173',
+      // Fixed here so auth tests never depend on (or leak) the developer's real secret.
+      JWT_SECRET: 'test-only-jwt-secret-0123456789-abcdefghij',
+      JWT_EXPIRES_IN_SECONDS: '28800',
       DATABASE_URL:
         process.env.TEST_DATABASE_URL ?? 'postgresql://unused:unused@localhost:5432/unused_test',
     },
