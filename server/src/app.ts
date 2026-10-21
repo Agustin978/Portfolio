@@ -9,6 +9,13 @@ import { createRequireAuth } from './modules/auth/auth.middleware.js';
 import { createAuthRepository } from './modules/auth/auth.repository.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { createAuthService } from './modules/auth/auth.service.js';
+import { createCategoriesController } from './modules/categories/categories.controller.js';
+import { createCategoriesRepository } from './modules/categories/categories.repository.js';
+import {
+  createCategoriesAdminRouter,
+  createCategoriesPublicRouter,
+} from './modules/categories/categories.routes.js';
+import { createCategoriesService } from './modules/categories/categories.service.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { getPrisma } from './shared/db/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
@@ -36,10 +43,17 @@ app.use(cookieParser());
 
 const requireAuth = createRequireAuth(authService);
 
+const categoriesController = createCategoriesController(
+  createCategoriesService(createCategoriesRepository(getPrisma())),
+);
+
 // Every private content module is registered here; createAdminRouter guards the whole group.
-export const adminMounts: AdminMount[] = [];
+export const adminMounts: AdminMount[] = [
+  { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
+];
 
 app.use('/api/v1/health', healthRouter);
+app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));
 app.use(
   '/api/v1/auth',
   noStore,
