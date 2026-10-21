@@ -30,6 +30,11 @@ export const createAuthController = (service: AuthService) => ({
     res.json(ok({ admin }));
   },
 
+  // requireAuth has already loaded the admin, so there is nothing left to look up here.
+  me(req: Request, res: Response) {
+    res.json(ok({ admin: req.admin }));
+  },
+
   logout(_req: Request, res: Response) {
     res.clearCookie(SESSION_COOKIE, sessionCookieOptions);
     res.json(ok(null));

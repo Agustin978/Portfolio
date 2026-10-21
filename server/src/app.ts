@@ -4,6 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { env } from './config/env.js';
 import { createAuthController } from './modules/auth/auth.controller.js';
+import { createRequireAuth } from './modules/auth/auth.middleware.js';
 import { createAuthRepository } from './modules/auth/auth.repository.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { createAuthService } from './modules/auth/auth.service.js';
@@ -25,7 +26,10 @@ app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
 app.use('/api/v1/health', healthRouter);
-app.use('/api/v1/auth', createAuthRouter(createAuthController(authService)));
+app.use(
+  '/api/v1/auth',
+  createAuthRouter(createAuthController(authService), createRequireAuth(authService)),
+);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

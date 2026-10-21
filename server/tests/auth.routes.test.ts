@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { app } from '../src/app.js';
@@ -7,6 +8,7 @@ import { createTestDb, resetDb, type TestDb } from './helpers/testDb.js';
 const PASSWORD = 'correct-horse-battery';
 
 let db: TestDb;
+let adminId: number;
 
 beforeAll(() => {
   db = createTestDb();
@@ -14,9 +16,10 @@ beforeAll(() => {
 afterAll(() => db.$disconnect());
 beforeEach(async () => {
   await resetDb(db);
-  await db.adminUser.create({
+  const admin = await db.adminUser.create({
     data: { email: 'admin@example.com', passwordHash: await hashPassword(PASSWORD) },
   });
+  adminId = admin.id;
 });
 
 // Each call gets its own client IP so the rate limiter's buckets never leak between tests.
@@ -93,5 +96,68 @@ describe('POST /api/v1/auth/logout', () => {
     const [cookie] = setCookies(res);
     expect(cookie).toMatch(/^session=;/);
     expect(cookie).toMatch(/Expires=Thu, 01 Jan 1970/i);
+  });
+});
+
+describe('GET /api/v1/auth/me', () => {
+  const secret = process.env.JWT_SECRET!;
+  const me = (token?: string) => {
+    const req = request(app).get('/api/v1/auth/me');
+    return token === undefined ? req : req.set('Cookie', `session=${token}`);
+  };
+  const sign = (options: jwt.SignOptions = {}, key = secret, subject = String(adminId)) =>
+    jwt.sign({}, key, { algorithm: 'HS256', subject, ...options });
+
+  const expectUnauthenticated = (res: request.Response) => {
+    expect(res.status).toBe(401);
+    expect(res.body).toMatchObject({ success: false, error: { code: 'UNAUTHENTICATED' } });
+  };
+
+  it('returns the admin for the cookie issued by login', async () => {
+    const loginRes = await login({ email: 'admin@example.com', password: PASSWORD });
+    const cookie = setCookies(loginRes)[0]!.split(';')[0]!;
+
+    const res = await request(app).get('/api/v1/auth/me').set('Cookie', cookie);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.admin).toEqual({ id: adminId, email: 'admin@example.com' });
+    expect(JSON.stringify(res.body)).not.toMatch(/hash/i);
+  });
+
+  it('rejects a request without a cookie', async () => {
+    expectUnauthenticated(await me());
+  });
+
+  it('rejects a tampered token', async () => {
+    expectUnauthenticated(await me(`${sign()}x`));
+  });
+
+  it('rejects a token signed with another secret', async () => {
+    expectUnauthenticated(await me(sign({}, 'another-secret-0123456789-abcdefghijkl')));
+  });
+
+  it('rejects a token with alg none', async () => {
+    const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+    const unsigned = `${encode({ alg: 'none', typ: 'JWT' })}.${encode({ sub: String(adminId) })}.`;
+
+    expectUnauthenticated(await me(unsigned));
+  });
+
+  it('rejects an expired token', async () => {
+    expectUnauthenticated(await me(sign({ expiresIn: -10 })));
+  });
+
+  it('rejects a token for an admin that does not exist', async () => {
+    expectUnauthenticated(await me(sign({}, secret, String(adminId + 999))));
+  });
+
+  it('rejects a token issued before admin_users.updated_at', async () => {
+    const token = sign();
+    await db.adminUser.update({
+      where: { id: adminId },
+      data: { updatedAt: new Date(Date.now() + 5000) },
+    });
+
+    expectUnauthenticated(await me(token));
   });
 });
