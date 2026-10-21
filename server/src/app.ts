@@ -39,7 +39,10 @@ import {
 import { createSocialLinksService } from './modules/social-links/social-links.service.js';
 import { createTechnologiesController } from './modules/technologies/technologies.controller.js';
 import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
-import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
+import {
+  createSkillsPublicRouter,
+  createTechnologiesAdminRouter,
+} from './modules/technologies/technologies.routes.js';
 import { createTechnologiesService } from './modules/technologies/technologies.service.js';
 import { createExperiencesController } from './modules/experiences/experiences.controller.js';
 import { createExperiencesRepository } from './modules/experiences/experiences.repository.js';
@@ -107,6 +110,7 @@ export const adminMounts: AdminMount[] = [
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/experiences', createExperiencesPublicRouter(experiencesController));
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
+app.use('/api/v1/skills', createSkillsPublicRouter(technologiesController));
 app.use('/api/v1/social-links', createSocialLinksPublicRouter(socialLinksController));
 app.use('/api/v1/projects', createProjectsPublicRouter(projectsController));
 app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));

@@ -5,6 +5,12 @@ import { createTechnologyBody, updateTechnologyBody } from './technologies.schem
 import type { TechnologiesService } from './technologies.service.js';
 
 export const createTechnologiesController = (service: TechnologiesService) => ({
+  // Technology names are single-language, so unlike the other public endpoints there is no ?lang.
+  async listSkills(_req: Request, res: Response) {
+    const groups = await service.listSkills();
+    res.json(ok(groups, { count: groups.length }));
+  },
+
   async list(_req: Request, res: Response) {
     const technologies = await service.list();
     res.json(ok(technologies, { count: technologies.length }));

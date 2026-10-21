@@ -144,3 +144,51 @@ describe('/api/v1/admin/technologies', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('GET /api/v1/skills (public)', () => {
+  const tech = (slug: string, skillGroup: string, extra: object = {}) =>
+    db.technology.create({
+      data: {
+        slug,
+        name: slug.toUpperCase(),
+        skillGroup: skillGroup as 'development',
+        showInSkills: true,
+        ...extra,
+      },
+    });
+
+  it('groups the technologies shown in skills in a fixed group order, skipping empty groups', async () => {
+    await tech('docker', 'infrastructure');
+    await tech('react', 'development', { sortOrder: 1 });
+    await tech('node', 'development', { sortOrder: 0 });
+    await tech('hidden', 'development', { showInSkills: false });
+    await tech('sql', 'data');
+
+    const res = await request(app).get('/api/v1/skills');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual([
+      {
+        group: 'development',
+        technologies: [
+          { slug: 'node', name: 'NODE' },
+          { slug: 'react', name: 'REACT' },
+        ],
+      },
+      { group: 'data', technologies: [{ slug: 'sql', name: 'SQL' }] },
+      { group: 'infrastructure', technologies: [{ slug: 'docker', name: 'DOCKER' }] },
+    ]);
+    expect(res.body.meta).toEqual({ count: 3 });
+    expect(keys(res.body.data[0])).toEqual(['group', 'technologies']);
+  });
+
+  it('breaks sortOrder ties by id and answers an empty list when nothing is shown', async () => {
+    expect((await request(app).get('/api/v1/skills')).body.data).toEqual([]);
+
+    await tech('b', 'other');
+    await tech('a', 'other');
+
+    const res = await request(app).get('/api/v1/skills');
+    expect(res.body.data[0].technologies.map((t: { slug: string }) => t.slug)).toEqual(['b', 'a']);
+  });
+});

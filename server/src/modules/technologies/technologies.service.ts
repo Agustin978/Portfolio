@@ -1,5 +1,12 @@
 import { AppError } from '../../shared/errors/AppError.js';
-import type { TechnologiesRepository, TechnologyInput } from './technologies.repository.js';
+import type {
+  SkillGroupValue,
+  TechnologiesRepository,
+  TechnologyInput,
+} from './technologies.repository.js';
+
+// Fixed display order of the groups; the client translates the group labels.
+const SKILL_GROUPS: readonly SkillGroupValue[] = ['development', 'data', 'infrastructure', 'other'];
 
 type AdminRow = NonNullable<Awaited<ReturnType<TechnologiesRepository['findById']>>>;
 
@@ -10,6 +17,16 @@ const toAdminTechnology = ({ _count, ...row }: AdminRow) => ({
 });
 
 export const createTechnologiesService = (repository: TechnologiesRepository) => ({
+  async listSkills() {
+    const rows = await repository.findForSkills();
+    return SKILL_GROUPS.map((group) => ({
+      group,
+      technologies: rows
+        .filter((row) => row.skillGroup === group)
+        .map(({ slug, name }) => ({ slug, name })),
+    })).filter(({ technologies }) => technologies.length > 0);
+  },
+
   async list() {
     return (await repository.findAll()).map(toAdminTechnology);
   },
