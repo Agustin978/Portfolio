@@ -34,7 +34,7 @@ describe('projects repository: deactivated_at IS NULL', () => {
 
     const rows = await createProjectsRepository(db).findPublished();
 
-    expect(rows.map((p) => p.id)).toEqual([visible.id]);
+    expect(rows.map((p) => p.slug)).toEqual([visible.slug]);
   });
 
   it('findPublishedBySlug does not return a deactivated project', async () => {
@@ -89,7 +89,9 @@ describe('projects service', () => {
   });
 
   it('offers no way to physically delete a project', () => {
-    expect(Object.keys(build())).toEqual(['deactivate', 'reactivate']);
-    expect(Object.keys(createProjectsRepository(db))).not.toContain('delete');
+    for (const name of ['delete', 'remove', 'destroy']) {
+      expect(Object.keys(build())).not.toContain(name);
+      expect(Object.keys(createProjectsRepository(db))).not.toContain(name);
+    }
   });
 });

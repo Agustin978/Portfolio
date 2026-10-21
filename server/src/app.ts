@@ -23,6 +23,13 @@ import {
   createProfilePublicRouter,
 } from './modules/profile/profile.routes.js';
 import { createProfileService } from './modules/profile/profile.service.js';
+import { createProjectsController } from './modules/projects/projects.controller.js';
+import { createProjectsRepository } from './modules/projects/projects.repository.js';
+import {
+  createProjectsAdminRouter,
+  createProjectsPublicRouter,
+} from './modules/projects/projects.routes.js';
+import { createProjectsService } from './modules/projects/projects.service.js';
 import { createSocialLinksController } from './modules/social-links/social-links.controller.js';
 import { createSocialLinksRepository } from './modules/social-links/social-links.repository.js';
 import {
@@ -73,11 +80,15 @@ const profileController = createProfileController(
 const socialLinksController = createSocialLinksController(
   createSocialLinksService(createSocialLinksRepository(getPrisma())),
 );
+const projectsController = createProjectsController(
+  createProjectsService(createProjectsRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
+  { path: '/projects', router: createProjectsAdminRouter(projectsController) },
   { path: '/social-links', router: createSocialLinksAdminRouter(socialLinksController) },
   { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
@@ -85,6 +96,7 @@ export const adminMounts: AdminMount[] = [
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
 app.use('/api/v1/social-links', createSocialLinksPublicRouter(socialLinksController));
+app.use('/api/v1/projects', createProjectsPublicRouter(projectsController));
 app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));
 app.use(
   '/api/v1/auth',
