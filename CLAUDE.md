@@ -54,6 +54,7 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 - **API de contenido (Fase 3)**: no existe DELETE de proyectos ni experiencias; son `PATCH .../deactivate` y `PATCH .../reactivate`.
 - **Contrato de la API**: ejemplos de cada endpoint en `docs/api.md` (actualizarlo en cada fase). Públicos en `/api/v1/...` con `?lang`; privados bajo `/api/v1/admin/...`, montados en `adminMounts` de `app.ts`: `createAdminRouter` aplica `requireAuth` y `no-store` una sola vez, y un test recorre todas las rutas de `/admin` verificando el 401. Los públicos usan `select` explícito (lista blanca) en el repository. Los PATCH son parciales con `z.strictObject`. Los errores de restricción de la base se traducen con `guarded` (`shared/db/guarded.ts`) en el repository: P2002 a 409, P2003 a 409 (borrar en uso) o 422 (referencia inexistente al escribir), P2025 a 404; nunca 500.
 - Redes sociales: sin borrado físico, se ocultan con `isVisible`.
+- Proyectos y experiencias: el service valida el estado resultante de cada PATCH (publicado exige ambos idiomas: `422 INCOMPLETE_TRANSLATION` con los campos que faltan). El slug de un proyecto queda bloqueado (`409 SLUG_LOCKED`) tras su primera publicación. Editar nunca reactiva algo desactivado. `technologyIds` (omitido = sin cambio, `[]` = vaciar) se aplica en una transacción; las tablas intermedias no tienen `sort_order`.
 - Los mensajes de contacto se guardan primero y el email se envía después (`email_status`).
 - Tests de base: usan `TEST_DATABASE_URL` (el nombre debe terminar en `_test`; los tests vacían las tablas).
 
@@ -93,8 +94,8 @@ _Última actualización: 2026-10-21._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
 - Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
-- Fase 3 (en curso, dos ramas): `feature/content-catalog` (base común, categorías, tecnologías, perfil, redes sociales; 128 tests pasan, pendiente de PR) y luego `feature/content-projects-experiences` (proyectos, experiencias, `/skills`), que se crea desde `dev` una vez fusionado el primer PR.
+- Fase 3: API de contenido. Primera rama (`feature/content-catalog`) fusionada en `dev` (PR #4). Segunda rama (`feature/content-projects-experiences`: proyectos, experiencias, `/skills`; 183 tests pasan) pendiente de PR hacia `dev`.
 - En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: segunda rama de la Fase 3. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: Fase 4 (imágenes con Cloudinary: multer, sharp, cloudinary). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: borrado de imágenes con Cloudinary (Fase 4), tal como se describe en la sección Datos.
