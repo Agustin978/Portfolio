@@ -16,6 +16,13 @@ import {
   createCategoriesPublicRouter,
 } from './modules/categories/categories.routes.js';
 import { createCategoriesService } from './modules/categories/categories.service.js';
+import { createProfileController } from './modules/profile/profile.controller.js';
+import { createProfileRepository } from './modules/profile/profile.repository.js';
+import {
+  createProfileAdminRouter,
+  createProfilePublicRouter,
+} from './modules/profile/profile.routes.js';
+import { createProfileService } from './modules/profile/profile.service.js';
 import { createTechnologiesController } from './modules/technologies/technologies.controller.js';
 import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
 import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
@@ -53,14 +60,19 @@ const categoriesController = createCategoriesController(
 const technologiesController = createTechnologiesController(
   createTechnologiesService(createTechnologiesRepository(getPrisma())),
 );
+const profileController = createProfileController(
+  createProfileService(createProfileRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
+  { path: '/profile', router: createProfileAdminRouter(profileController) },
   { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
 
 app.use('/api/v1/health', healthRouter);
+app.use('/api/v1/profile', createProfilePublicRouter(profileController));
 app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));
 app.use(
   '/api/v1/auth',
