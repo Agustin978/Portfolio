@@ -23,6 +23,13 @@ import {
   createProfilePublicRouter,
 } from './modules/profile/profile.routes.js';
 import { createProfileService } from './modules/profile/profile.service.js';
+import { createSocialLinksController } from './modules/social-links/social-links.controller.js';
+import { createSocialLinksRepository } from './modules/social-links/social-links.repository.js';
+import {
+  createSocialLinksAdminRouter,
+  createSocialLinksPublicRouter,
+} from './modules/social-links/social-links.routes.js';
+import { createSocialLinksService } from './modules/social-links/social-links.service.js';
 import { createTechnologiesController } from './modules/technologies/technologies.controller.js';
 import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
 import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
@@ -63,16 +70,21 @@ const technologiesController = createTechnologiesController(
 const profileController = createProfileController(
   createProfileService(createProfileRepository(getPrisma())),
 );
+const socialLinksController = createSocialLinksController(
+  createSocialLinksService(createSocialLinksRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
+  { path: '/social-links', router: createSocialLinksAdminRouter(socialLinksController) },
   { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
 
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
+app.use('/api/v1/social-links', createSocialLinksPublicRouter(socialLinksController));
 app.use('/api/v1/project-categories', createCategoriesPublicRouter(categoriesController));
 app.use(
   '/api/v1/auth',
