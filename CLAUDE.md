@@ -52,13 +52,15 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 - **Borrado real**: solo `contact_messages`. Categorías y tecnologías únicamente si no están en uso (RESTRICT, contando proyectos desactivados).
 - **Imágenes (se implementa en la Fase 4)**: una imagen se elimina solo al quitarla de un proyecto o experiencia. El service, en una transacción, borra el vínculo y la fila de `images` si queda sin vínculos; después, fuera de la transacción, borra el archivo en Cloudinary. Si Cloudinary falla, se registra el error y no se revierte nada.
 - **API de contenido (Fase 3)**: no existe DELETE de proyectos ni experiencias; son `PATCH .../deactivate` y `PATCH .../reactivate`.
+- **Contrato de la API**: ejemplos de cada endpoint en `docs/api.md` (actualizarlo en cada fase). Públicos en `/api/v1/...` con `?lang`; privados bajo `/api/v1/admin/...`, montados en `adminMounts` de `app.ts`: `createAdminRouter` aplica `requireAuth` y `no-store` una sola vez, y un test recorre todas las rutas de `/admin` verificando el 401. Los públicos usan `select` explícito (lista blanca) en el repository. Los PATCH son parciales con `z.strictObject`. Los errores de restricción de la base se traducen con `guarded` (`shared/db/guarded.ts`) en el repository: P2002 a 409, P2003 a 409 (borrar en uso) o 422 (referencia inexistente al escribir), P2025 a 404; nunca 500.
+- Redes sociales: sin borrado físico, se ocultan con `isVisible`.
 - Los mensajes de contacto se guardan primero y el email se envía después (`email_status`).
 - Tests de base: usan `TEST_DATABASE_URL` (el nombre debe terminar en `_test`; los tests vacían las tablas).
 
 ## Convenciones
 
 - Componentes y clases: PascalCase. Hooks y utilidades: camelCase. Tablas: snake_case plural. Columnas: snake_case.
-- Archivos de módulo del servidor: `<modulo>.controller.ts`, `.service.ts`, `.repository.ts`, `.routes.ts`. Imports relativos con extensión `.js` (NodeNext).
+- Archivos de módulo del servidor: `<modulo>.controller.ts`, `.service.ts`, `.repository.ts`, `.routes.ts` y, si hay body que validar, `.schemas.ts` (Zod). Imports relativos con extensión `.js` (NodeNext).
 - Comentarios solo para el porqué, no el qué.
 
 ## Diseño
@@ -90,8 +92,9 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 _Última actualización: 2026-10-21._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
-- Fase 2 (rama `feature/admin-auth`): autenticación hecha, 68 tests pasan. Pendiente de PR hacia `dev`.
+- Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
+- Fase 3 (en curso, dos ramas): `feature/content-catalog` (base común, categorías, tecnologías, perfil, redes sociales; 128 tests pasan, pendiente de PR) y luego `feature/content-projects-experiences` (proyectos, experiencias, `/skills`), que se crea desde `dev` una vez fusionado el primer PR.
 - En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: Fase 3 (API de contenido), usando `requireAuth` en las rutas del panel. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: segunda rama de la Fase 3. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: borrado de imágenes con Cloudinary (Fase 4), tal como se describe en la sección Datos.
