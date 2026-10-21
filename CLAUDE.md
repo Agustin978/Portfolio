@@ -38,6 +38,14 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 
 **Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet.
 
+**Autenticación** (Fase 2, hecho): `server/src/modules/auth/`. `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`; `requireAuth` protege las rutas del panel (se importa de `auth.middleware.ts` y se cablea en `app.ts`).
+- JWT HS256 con solo `sub` (más `iat`/`exp`), en cookie `session`. Duración: `JWT_EXPIRES_IN_SECONDS` (8 h por defecto), usada para el `exp` y el `maxAge`. Sin refresh token.
+- `requireAuth` relee al admin por id en cada request y rechaza el token si el admin no existe o si `iat` es anterior a `admin_users.updated_at`. Re-correr el seed con otra `ADMIN_PASSWORD` rota la contraseña y cierra las sesiones viejas.
+- Login: mismo error `INVALID_CREDENTIALS` para email inexistente y contraseña errónea, con una verificación argon2 contra un hash falso (mismos parámetros, `shared/security/password.ts`). El email se normaliza (trim y minúsculas) en login y seed. Límites: email 254, contraseña 256.
+- Rate limit: 5 intentos fallidos cada 15 min por IP (`skipSuccessfulRequests`), con `createRateLimiter` (reutilizable en contacto). `trust proxy` = 1, nunca `true`.
+- Guardia de origen: POST/PUT/PATCH/DELETE con `Origin` distinto de `CLIENT_ORIGIN` responden 403 `FORBIDDEN_ORIGIN`; sin `Origin` se permite. `Cache-Control: no-store` en `/auth/*`. No registrar body ni cookies.
+- **Riesgo para la Fase 9**: con el cliente (Cloudflare Pages) y la API (Render) en dominios distintos, la cookie debe ser `SameSite=None; Secure`, y Safari bloquea las cookies entre sitios. Hoy es `SameSite=Lax` (`auth.cookie.ts`). La decisión (dominio propio bajo el mismo sitio, proxy, etc.) se toma en esa fase.
+
 **Datos** (Fase 1, hecho): esquema en `server/prisma/schema.prisma`, 13 tablas — admin_users, profile, project_categories, projects, experiences, technologies, project_technologies, experience_technologies, images, project_images, experience_images, social_links, contact_messages. Todo texto visible lleva columnas `_es` y `_en` (nombres de tecnologías y empresas: una sola columna). Publicar exige ambos idiomas completos y no vacíos (CHECK en la base). Los CHECK, el singleton de `profile` y el índice parcial de portada están escritos a mano al final de la migración init: Prisma no los modela, así que revisar siempre el SQL de cada migración nueva (la prueba de la Fase 1 confirmó que Prisma no los elimina).
 
 - **Desactivación lógica**: `projects` y `experiences` no se borran nunca; tienen `deactivated_at` (independiente de `status`). El service expone solo `deactivate` y `reactivate`. El repository aplica `deactivated_at IS NULL` en toda lectura pública y en el listado por defecto del panel. El slug es único incluyendo desactivados.
@@ -79,12 +87,11 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 
 ## Estado actual y próximos pasos
 
-_Última actualización: 2026-10-20._
+_Última actualización: 2026-10-21._
 
-- Fase 0: hecha y fusionada en `dev`.
-- Fase 1 (rama `feature/database-schema`): esquema, migraciones `init` y `fix_publish_checks`, repositories/services de projects y experiences, seed y tests (28 pasan). Pendiente de PR hacia `dev`.
-- Pendiente para cerrar la Fase 1: correr `npm run db:seed -w server` en `portfolio_dev` (requiere `ADMIN_PASSWORD` de 12+ caracteres en `.env`).
-- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example`, crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
+- Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
+- Fase 2 (rama `feature/admin-auth`): autenticación hecha, 68 tests pasan. Pendiente de PR hacia `dev`.
+- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: Fase 2 (autenticación: jsonwebtoken y express-rate-limit). Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: Fase 3 (API de contenido), usando `requireAuth` en las rutas del panel. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: borrado de imágenes con Cloudinary (Fase 4), tal como se describe en la sección Datos.

@@ -15,6 +15,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   CLIENT_ORIGIN: z.url(),
   DATABASE_URL: z.string().min(1),
+  // HS256 key: short secrets are brute-forceable offline from a single captured token.
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  // One value for both the JWT `exp` and the cookie `maxAge`, so the two can never drift apart.
+  JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().positive().default(28800),
 });
 
 const parsed = envSchema.safeParse(process.env);
