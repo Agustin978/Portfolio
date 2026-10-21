@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import { env } from './config/env.js';
+import { createAdminRouter, type AdminMount } from './modules/admin/admin.routes.js';
 import { createAuthController } from './modules/auth/auth.controller.js';
 import { createRequireAuth } from './modules/auth/auth.middleware.js';
 import { createAuthRepository } from './modules/auth/auth.repository.js';
@@ -33,13 +34,18 @@ app.use(createOriginGuard(env.CLIENT_ORIGIN));
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
+const requireAuth = createRequireAuth(authService);
+
+// Every private content module is registered here; createAdminRouter guards the whole group.
+export const adminMounts: AdminMount[] = [];
+
 app.use('/api/v1/health', healthRouter);
 app.use(
   '/api/v1/auth',
   noStore,
   createAuthRouter({
     controller: createAuthController(authService),
-    requireAuth: createRequireAuth(authService),
+    requireAuth,
     loginRateLimiter: createRateLimiter({
       limit: 5,
       windowMs: 15 * 60 * 1000,
@@ -47,6 +53,7 @@ app.use(
     }),
   }),
 );
+app.use('/api/v1/admin', createAdminRouter(requireAuth, adminMounts));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
