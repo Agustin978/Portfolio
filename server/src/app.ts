@@ -16,6 +16,10 @@ import {
   createCategoriesPublicRouter,
 } from './modules/categories/categories.routes.js';
 import { createCategoriesService } from './modules/categories/categories.service.js';
+import { createTechnologiesController } from './modules/technologies/technologies.controller.js';
+import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
+import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
+import { createTechnologiesService } from './modules/technologies/technologies.service.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { getPrisma } from './shared/db/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
@@ -46,10 +50,14 @@ const requireAuth = createRequireAuth(authService);
 const categoriesController = createCategoriesController(
   createCategoriesService(createCategoriesRepository(getPrisma())),
 );
+const technologiesController = createTechnologiesController(
+  createTechnologiesService(createTechnologiesRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
+  { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
 
 app.use('/api/v1/health', healthRouter);
