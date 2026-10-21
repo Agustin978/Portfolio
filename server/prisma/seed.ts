@@ -1,8 +1,9 @@
 import path from 'node:path';
-import argon2 from 'argon2';
 import dotenv from 'dotenv';
 import { z } from 'zod';
 import { createPrismaClient } from '../src/shared/db/prisma.js';
+import { normalizedEmail } from '../src/shared/security/email.js';
+import { hashPassword } from '../src/shared/security/password.js';
 
 dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env'), quiet: true });
 
@@ -10,7 +11,7 @@ dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env'), quiet: tr
 const seedEnv = z
   .object({
     DATABASE_URL: z.string().min(1),
-    ADMIN_EMAIL: z.email(),
+    ADMIN_EMAIL: normalizedEmail,
     ADMIN_PASSWORD: z.string().min(12, 'ADMIN_PASSWORD must be at least 12 characters'),
   })
   .parse(process.env);
@@ -18,7 +19,7 @@ const seedEnv = z
 const db = createPrismaClient(seedEnv.DATABASE_URL);
 
 async function main() {
-  const passwordHash = await argon2.hash(seedEnv.ADMIN_PASSWORD, { type: argon2.argon2id });
+  const passwordHash = await hashPassword(seedEnv.ADMIN_PASSWORD);
 
   // Re-running the seed re-applies ADMIN_PASSWORD, which is how the password gets rotated.
   await db.adminUser.upsert({
