@@ -7,12 +7,14 @@ import { z } from 'zod';
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 dotenv.config({ path: path.join(rootDir, '.env'), quiet: true });
 
-// Only variables used from Phase 0 are required; later phases add theirs when they need them,
+// Only variables used so far are required; later phases add theirs when they need them,
 // so a fresh clone can boot without credentials for services it doesn't use yet.
+// ADMIN_EMAIL / ADMIN_PASSWORD are read by the seed script only, never by the running API.
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
   CLIENT_ORIGIN: z.url(),
+  DATABASE_URL: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
