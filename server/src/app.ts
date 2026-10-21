@@ -41,6 +41,13 @@ import { createTechnologiesController } from './modules/technologies/technologie
 import { createTechnologiesRepository } from './modules/technologies/technologies.repository.js';
 import { createTechnologiesAdminRouter } from './modules/technologies/technologies.routes.js';
 import { createTechnologiesService } from './modules/technologies/technologies.service.js';
+import { createExperiencesController } from './modules/experiences/experiences.controller.js';
+import { createExperiencesRepository } from './modules/experiences/experiences.repository.js';
+import {
+  createExperiencesAdminRouter,
+  createExperiencesPublicRouter,
+} from './modules/experiences/experiences.routes.js';
+import { createExperiencesService } from './modules/experiences/experiences.service.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { getPrisma } from './shared/db/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
@@ -83,10 +90,14 @@ const socialLinksController = createSocialLinksController(
 const projectsController = createProjectsController(
   createProjectsService(createProjectsRepository(getPrisma())),
 );
+const experiencesController = createExperiencesController(
+  createExperiencesService(createExperiencesRepository(getPrisma())),
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
+  { path: '/experiences', router: createExperiencesAdminRouter(experiencesController) },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
   { path: '/projects', router: createProjectsAdminRouter(projectsController) },
   { path: '/social-links', router: createSocialLinksAdminRouter(socialLinksController) },
@@ -94,6 +105,7 @@ export const adminMounts: AdminMount[] = [
 ];
 
 app.use('/api/v1/health', healthRouter);
+app.use('/api/v1/experiences', createExperiencesPublicRouter(experiencesController));
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
 app.use('/api/v1/social-links', createSocialLinksPublicRouter(socialLinksController));
 app.use('/api/v1/projects', createProjectsPublicRouter(projectsController));
