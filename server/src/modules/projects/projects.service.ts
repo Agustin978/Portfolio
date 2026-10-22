@@ -24,7 +24,13 @@ const REQUIRED_WHEN_PUBLISHED = [
 
 const notFound = () => new AppError(404, 'PROJECT_NOT_FOUND', 'Project not found');
 
-const toAdminDetail = ({ technologies, startedAt, endedAt, ...row }: DetailRow) => ({
+const toAdminDetail = ({
+  technologies,
+  images: _images,
+  startedAt,
+  endedAt,
+  ...row
+}: DetailRow) => ({
   ...row,
   startedAt: toDateOnly(startedAt),
   endedAt: toDateOnly(endedAt),
@@ -55,12 +61,26 @@ const toPublicDetail = (row: PublicDetailRow, lang: Lang) => ({
   description: localized(lang, row.descriptionEs, row.descriptionEn),
 });
 
+const missingCover = () =>
+  new AppError(422, 'MISSING_COVER', 'A published project needs at least one image as its cover', {
+    images: ['upload an image first'],
+  });
+
 // The resulting state, not just the patch, must be valid: a patch that empties a field of an
 // already-published project is rejected the same way as publishing an incomplete draft.
-const assertValidState = (fields: ProjectFields) => {
+// A deactivated project is invisible, so it may sit published without a cover; reactivating it
+// is where the cover is demanded again.
+const assertValidState = (
+  fields: ProjectFields,
+  { hasCover, deactivated }: { hasCover: boolean; deactivated: boolean },
+) => {
   assertDateRange(fields.startedAt, fields.endedAt, 'endedAt');
-  if (fields.status === 'published') assertPublishable(fields, REQUIRED_WHEN_PUBLISHED);
+  if (fields.status !== 'published') return;
+  assertPublishable(fields, REQUIRED_WHEN_PUBLISHED);
+  if (!hasCover && !deactivated) throw missingCover();
 };
+
+const hasCover = (row: DetailRow) => row.images.some((image) => image.isCover);
 
 // There is deliberately no delete: projects are only deactivated, so slugs and history survive.
 export const createProjectsService = (repository: ProjectsRepository) => ({
@@ -104,7 +124,8 @@ export const createProjectsService = (repository: ProjectsRepository) => ({
       isFeatured: given.isFeatured ?? false,
       sortOrder: given.sortOrder ?? 0,
     };
-    assertValidState(fields);
+    // A brand-new project has no images yet, so it can only start as a draft.
+    assertValidState(fields, { hasCover: false, deactivated: false });
 
     const publishedAt = fields.status === 'published' ? new Date() : null;
     return toAdminDetail(await repository.create({ ...fields, publishedAt }, technologyIds));
@@ -125,7 +146,10 @@ export const createProjectsService = (repository: ProjectsRepository) => ({
       );
     }
 
-    assertValidState({ ...current, ...changes });
+    assertValidState(
+      { ...current, ...changes },
+      { hasCover: hasCover(current), deactivated: current.deactivatedAt !== null },
+    );
 
     // deactivatedAt is never part of an edit: editing must not bring a project back to life.
     const data: ProjectUpdateData = { ...changes };
@@ -149,6 +173,8 @@ export const createProjectsService = (repository: ProjectsRepository) => ({
     if (!project.deactivatedAt) {
       throw new AppError(409, 'PROJECT_NOT_DEACTIVATED', 'Project is not deactivated');
     }
+    // Its last image may have been removed while it was deactivated.
+    if (project.status === 'published' && !hasCover(project)) throw missingCover();
     return toAdminDetail(await repository.setDeactivatedAt(id, null));
   },
 });

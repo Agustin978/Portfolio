@@ -71,6 +71,8 @@ const adminDetailSelect = {
   createdAt: true,
   updatedAt: true,
   technologies: { select: { technologyId: true }, orderBy: { technologyId: 'asc' } },
+  // Only used by the service to know whether a cover exists; it is not part of the response.
+  images: { select: { isCover: true } },
 } satisfies Prisma.ProjectSelect;
 
 // The columns the API lets an admin write. publishedAt/deactivatedAt are set by the service.

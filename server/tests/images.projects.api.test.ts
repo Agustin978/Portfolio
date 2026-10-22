@@ -304,6 +304,21 @@ describe('DELETE /admin/projects/:id/images/:imageId', () => {
     expect(await db.image.count()).toBe(1);
   });
 
+  it('lets the last image go once the project is unpublished', async () => {
+    const id = (await createProject(db, categoryId, { ...fullProjectCopy, status: 'published' }))
+      .id;
+    const image = await uploadOk(id);
+    await request(app)
+      .patch(`/api/v1/admin/projects/${id}`)
+      .set('Cookie', cookie)
+      .send({ status: 'draft' });
+
+    const res = await del(image.id, id);
+
+    expect(res.status).toBe(200);
+    expect(await db.projectImage.count({ where: { projectId: id } })).toBe(0);
+  });
+
   it('answers 409 COVER_REQUIRED for the last image of a published project', async () => {
     const live = (await createProject(db, categoryId, { ...fullProjectCopy, status: 'published' }))
       .id;
