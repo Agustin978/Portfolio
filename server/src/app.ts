@@ -16,6 +16,11 @@ import {
   createCategoriesPublicRouter,
 } from './modules/categories/categories.routes.js';
 import { createCategoriesService } from './modules/categories/categories.service.js';
+import { createImagesController } from './modules/images/images.controller.js';
+import { createImagesRepository } from './modules/images/images.repository.js';
+import { createImagesAdminRouter } from './modules/images/images.routes.js';
+import { updateProjectImageBody } from './modules/images/images.schemas.js';
+import { createImagesService } from './modules/images/images.service.js';
 import { createProfileController } from './modules/profile/profile.controller.js';
 import { createProfileRepository } from './modules/profile/profile.repository.js';
 import {
@@ -57,6 +62,7 @@ import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler
 import { noStore } from './shared/middlewares/noStore.js';
 import { createOriginGuard } from './shared/middlewares/originGuard.js';
 import { createRateLimiter } from './shared/middlewares/rateLimit.js';
+import { imageStorage } from './shared/storage/index.js';
 
 export const app = express();
 
@@ -97,12 +103,19 @@ const experiencesController = createExperiencesController(
   createExperiencesService(createExperiencesRepository(getPrisma())),
 );
 
+const imagesRepository = createImagesRepository(getPrisma());
+const projectImagesController = createImagesController(
+  createImagesService({ repository: imagesRepository, storage: imageStorage, kind: 'project' }),
+  updateProjectImageBody,
+);
+
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
   { path: '/experiences', router: createExperiencesAdminRouter(experiencesController) },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
   { path: '/projects', router: createProjectsAdminRouter(projectsController) },
+  { path: '/projects/:id/images', router: createImagesAdminRouter(projectImagesController) },
   { path: '/social-links', router: createSocialLinksAdminRouter(socialLinksController) },
   { path: '/technologies', router: createTechnologiesAdminRouter(technologiesController) },
 ];
