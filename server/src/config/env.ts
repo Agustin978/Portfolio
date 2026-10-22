@@ -10,16 +10,40 @@ dotenv.config({ path: path.join(rootDir, '.env'), quiet: true });
 // Only variables used so far are required; later phases add theirs when they need them,
 // so a fresh clone can boot without credentials for services it doesn't use yet.
 // ADMIN_EMAIL / ADMIN_PASSWORD are read by the seed script only, never by the running API.
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().positive().default(4000),
-  CLIENT_ORIGIN: z.url(),
-  DATABASE_URL: z.string().min(1),
-  // HS256 key: short secrets are brute-forceable offline from a single captured token.
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
-  // One value for both the JWT `exp` and the cookie `maxAge`, so the two can never drift apart.
-  JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().positive().default(28800),
-});
+const cloudinaryKeys = [
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+] as const;
+
+// An empty value in .env ("CLOUDINARY_API_KEY=") counts as unset.
+const optionalString = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.string().min(1).optional(),
+);
+
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().positive().default(4000),
+    CLIENT_ORIGIN: z.url(),
+    DATABASE_URL: z.string().min(1),
+    // HS256 key: short secrets are brute-forceable offline from a single captured token.
+    JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+    // One value for both the JWT `exp` and the cookie `maxAge`, so the two can never drift apart.
+    JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().positive().default(28800),
+    CLOUDINARY_CLOUD_NAME: optionalString,
+    CLOUDINARY_API_KEY: optionalString,
+    CLOUDINARY_API_SECRET: optionalString,
+  })
+  // Locally the API boots without Cloudinary (uploads answer 503); production must not.
+  .superRefine((env, ctx) => {
+    if (env.NODE_ENV !== 'production') return;
+    for (const key of cloudinaryKeys) {
+      if (!env[key])
+        ctx.addIssue({ code: 'custom', path: [key], message: 'required in production' });
+    }
+  });
 
 const parsed = envSchema.safeParse(process.env);
 
