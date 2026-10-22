@@ -19,7 +19,10 @@ import { createCategoriesService } from './modules/categories/categories.service
 import { createImagesController } from './modules/images/images.controller.js';
 import { createImagesRepository } from './modules/images/images.repository.js';
 import { createImagesAdminRouter } from './modules/images/images.routes.js';
-import { updateProjectImageBody } from './modules/images/images.schemas.js';
+import {
+  updateExperienceImageBody,
+  updateProjectImageBody,
+} from './modules/images/images.schemas.js';
 import { createImagesService } from './modules/images/images.service.js';
 import { createProfileController } from './modules/profile/profile.controller.js';
 import { createProfileRepository } from './modules/profile/profile.repository.js';
@@ -108,11 +111,19 @@ const projectImagesController = createImagesController(
   createImagesService({ repository: imagesRepository, storage: imageStorage, kind: 'project' }),
   updateProjectImageBody,
 );
+const experienceImagesController = createImagesController(
+  createImagesService({ repository: imagesRepository, storage: imageStorage, kind: 'experience' }),
+  updateExperienceImageBody,
+);
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
   { path: '/experiences', router: createExperiencesAdminRouter(experiencesController) },
+  {
+    path: '/experiences/:id/images',
+    router: createImagesAdminRouter(experienceImagesController),
+  },
   { path: '/profile', router: createProfileAdminRouter(profileController) },
   { path: '/projects', router: createProjectsAdminRouter(projectsController) },
   { path: '/projects/:id/images', router: createImagesAdminRouter(projectImagesController) },
