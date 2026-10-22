@@ -74,6 +74,7 @@ describe('GET /api/v1/projects (public)', () => {
     expect(res.body.meta).toEqual({ count: 1 });
     expect(keys(res.body.data[0])).toEqual([
       'category',
+      'cover',
       'endedAt',
       'isFeatured',
       'liveUrl',
@@ -150,6 +151,86 @@ describe('GET /api/v1/projects (public)', () => {
   });
 });
 
+describe('project images in responses', () => {
+  const imageKeys = ['alt', 'height', 'url', 'width'];
+
+  it('puts the cover in the list and every image, in order, in the detail', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'pics' });
+    await attachImage(db, project.id, { sortOrder: 2, isCover: false, altEs: 'tercera' });
+    await attachImage(db, project.id, { sortOrder: 0, isCover: true, altEs: 'portada' });
+    await attachImage(db, project.id, { sortOrder: 1, isCover: false, altEs: 'segunda' });
+
+    const list = await request(app).get('/api/v1/projects');
+    const detail = await request(app).get('/api/v1/projects/pics');
+
+    expect(keys(list.body.data[0].cover)).toEqual(imageKeys);
+    expect(list.body.data[0].cover).toMatchObject({ alt: 'portada', width: 1200, height: 800 });
+    expect(list.body.data[0]).not.toHaveProperty('images');
+    expect(detail.body.data.cover.alt).toBe('portada');
+    expect(detail.body.data.images.map((i: { alt: string }) => i.alt)).toEqual([
+      'portada',
+      'segunda',
+      'tercera',
+    ]);
+    expect(keys(detail.body.data.images[0])).toEqual(imageKeys);
+  });
+
+  it('translates alt text with a Spanish fallback and null when both are missing', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'alts' });
+    await attachImage(db, project.id, { sortOrder: 0, altEs: 'solo es' });
+    await attachImage(db, project.id, { sortOrder: 1, isCover: false, altEs: 'a', altEn: 'b' });
+    await attachImage(db, project.id, { sortOrder: 2, isCover: false });
+
+    const en = await request(app).get('/api/v1/projects/alts?lang=en');
+    const es = await request(app).get('/api/v1/projects/alts');
+
+    expect(en.body.data.images.map((i: { alt: string | null }) => i.alt)).toEqual([
+      'solo es',
+      'b',
+      null,
+    ]);
+    expect(es.body.data.images.map((i: { alt: string | null }) => i.alt)).toEqual([
+      'solo es',
+      'a',
+      null,
+    ]);
+  });
+
+  it('never exposes storage details', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'safe' });
+    await attachImage(db, project.id);
+
+    const res = await request(app).get('/api/v1/projects/safe');
+
+    expect(JSON.stringify(res.body)).not.toMatch(
+      /portfolio\/test|cloudinaryPublicId|publicId|isCover/i,
+    );
+  });
+
+  it('adds the images to the admin detail but not to the admin list', async () => {
+    const project = await createProject(db, categoryId, { slug: 'adm' });
+    const second = await attachImage(db, project.id, { sortOrder: 1, isCover: false });
+    const first = await attachImage(db, project.id, { sortOrder: 0, altEn: 'Cover' });
+
+    const detail = await getAdmin(project.id);
+    const list = await request(app).get(admin).set('Cookie', cookie);
+
+    expect(detail.body.data.images.map((i: { id: number }) => i.id)).toEqual([first.id, second.id]);
+    expect(keys(detail.body.data.images[0])).toEqual([
+      'altEn',
+      'altEs',
+      'height',
+      'id',
+      'isCover',
+      'sortOrder',
+      'url',
+      'width',
+    ]);
+    expect(detail.body.data.images[0]).toMatchObject({ isCover: true, altEn: 'Cover' });
+    expect(list.body.data[0]).not.toHaveProperty('images');
+  });
+});
+
 describe('GET /api/v1/projects/:slug (public)', () => {
   it('returns the detail keys, the list keys plus description', async () => {
     await createProject(db, categoryId, { ...published, slug: 'one' });
@@ -159,8 +240,10 @@ describe('GET /api/v1/projects/:slug (public)', () => {
     expect(res.status).toBe(200);
     expect(keys(res.body.data)).toEqual([
       'category',
+      'cover',
       'description',
       'endedAt',
+      'images',
       'isFeatured',
       'liveUrl',
       'repoUrl',
@@ -225,6 +308,7 @@ describe('POST /api/v1/admin/projects', () => {
       'descriptionEs',
       'endedAt',
       'id',
+      'images',
       'isFeatured',
       'liveUrl',
       'publishedAt',

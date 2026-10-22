@@ -3,6 +3,11 @@ import { guarded } from '../../shared/db/guarded.js';
 import type { PrismaClient } from '../../shared/db/prisma.js';
 import { AppError } from '../../shared/errors/AppError.js';
 import { invalidReference } from '../../shared/validation/publishable.js';
+import {
+  adminExperienceImageLinkSelect,
+  IMAGE_ORDER,
+  publicExperienceImageLinkSelect,
+} from '../images/images.mapper.js';
 
 // Public reads must never expose deactivated rows, so the filter lives here in one place
 // instead of being repeated by every caller.
@@ -24,6 +29,7 @@ const publicSelect = {
     select: { technology: { select: { slug: true, name: true } } },
     orderBy: [{ technology: { sortOrder: 'asc' } }, { technologyId: 'asc' }],
   },
+  images: { select: publicExperienceImageLinkSelect, orderBy: [...IMAGE_ORDER] },
 } satisfies Prisma.ExperienceSelect;
 
 const adminListSelect = {
@@ -56,6 +62,7 @@ const adminDetailSelect = {
   createdAt: true,
   updatedAt: true,
   technologies: { select: { technologyId: true }, orderBy: { technologyId: 'asc' } },
+  images: { select: adminExperienceImageLinkSelect, orderBy: [...IMAGE_ORDER] },
 } satisfies Prisma.ExperienceSelect;
 
 // The columns the API lets an admin write. deactivatedAt is changed only by deactivate/reactivate.

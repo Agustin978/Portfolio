@@ -2,6 +2,7 @@ import { AppError } from '../../shared/errors/AppError.js';
 import { toDateOnly } from '../../shared/http/dates.js';
 import { localized, type Lang } from '../../shared/http/lang.js';
 import { assertDateRange, assertPublishable } from '../../shared/validation/publishable.js';
+import { toAdminProjectImage, toPublicImage } from '../images/images.mapper.js';
 import type {
   ProjectFields,
   ProjectUpdateData,
@@ -24,18 +25,18 @@ const REQUIRED_WHEN_PUBLISHED = [
 
 const notFound = () => new AppError(404, 'PROJECT_NOT_FOUND', 'Project not found');
 
-const toAdminDetail = ({
-  technologies,
-  images: _images,
-  startedAt,
-  endedAt,
-  ...row
-}: DetailRow) => ({
+const toAdminDetail = ({ technologies, images, startedAt, endedAt, ...row }: DetailRow) => ({
   ...row,
+  images: images.map(toAdminProjectImage),
   startedAt: toDateOnly(startedAt),
   endedAt: toDateOnly(endedAt),
   technologyIds: technologies.map((t) => t.technologyId),
 });
+
+const coverOf = (row: PublicListRow | PublicDetailRow, lang: Lang) => {
+  const cover = row.images.find((link) => link.isCover);
+  return cover ? toPublicImage(cover.image, lang) : null;
+};
 
 const toPublicListItem = (row: PublicListRow, lang: Lang) => ({
   slug: row.slug,
@@ -54,11 +55,13 @@ const toPublicListItem = (row: PublicListRow, lang: Lang) => ({
     slug: technology.slug,
     name: technology.name,
   })),
+  cover: coverOf(row, lang),
 });
 
 const toPublicDetail = (row: PublicDetailRow, lang: Lang) => ({
   ...toPublicListItem(row, lang),
   description: localized(lang, row.descriptionEs, row.descriptionEn),
+  images: row.images.map((link) => toPublicImage(link.image, lang)),
 });
 
 const missingCover = () =>

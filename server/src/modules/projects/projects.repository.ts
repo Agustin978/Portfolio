@@ -3,6 +3,11 @@ import { guarded } from '../../shared/db/guarded.js';
 import type { PrismaClient } from '../../shared/db/prisma.js';
 import { AppError } from '../../shared/errors/AppError.js';
 import { invalidReference } from '../../shared/validation/publishable.js';
+import {
+  adminImageLinkSelect,
+  IMAGE_ORDER,
+  publicImageLinkSelect,
+} from '../images/images.mapper.js';
 
 // Public reads must never expose deactivated rows, so the filter lives here in one place
 // instead of being repeated by every caller.
@@ -27,12 +32,15 @@ const publicListSelect = {
     select: { technology: { select: { slug: true, name: true } } },
     orderBy: [{ technology: { sortOrder: 'asc' } }, { technologyId: 'asc' }],
   },
+  // The list only needs the cover; the detail below overrides this with every image.
+  images: { where: { isCover: true }, select: publicImageLinkSelect, take: 1 },
 } satisfies Prisma.ProjectSelect;
 
 const publicDetailSelect = {
   ...publicListSelect,
   descriptionEs: true,
   descriptionEn: true,
+  images: { select: publicImageLinkSelect, orderBy: [...IMAGE_ORDER] },
 } satisfies Prisma.ProjectSelect;
 
 const adminListSelect = {
@@ -71,8 +79,7 @@ const adminDetailSelect = {
   createdAt: true,
   updatedAt: true,
   technologies: { select: { technologyId: true }, orderBy: { technologyId: 'asc' } },
-  // Only used by the service to know whether a cover exists; it is not part of the response.
-  images: { select: { isCover: true } },
+  images: { select: adminImageLinkSelect, orderBy: [...IMAGE_ORDER] },
 } satisfies Prisma.ProjectSelect;
 
 // The columns the API lets an admin write. publishedAt/deactivatedAt are set by the service.

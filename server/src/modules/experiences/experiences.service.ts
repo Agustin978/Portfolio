@@ -2,6 +2,7 @@ import { AppError } from '../../shared/errors/AppError.js';
 import { toDateOnly } from '../../shared/http/dates.js';
 import { localized, type Lang } from '../../shared/http/lang.js';
 import { assertDateRange, assertPublishable } from '../../shared/validation/publishable.js';
+import { toAdminExperienceImage, toPublicImage } from '../images/images.mapper.js';
 import type {
   ExperienceFields,
   ExperienceUpdateData,
@@ -16,8 +17,9 @@ const REQUIRED_WHEN_PUBLISHED = ['roleEs', 'roleEn', 'descriptionEs', 'descripti
 
 const notFound = () => new AppError(404, 'EXPERIENCE_NOT_FOUND', 'Experience not found');
 
-const toAdminDetail = ({ technologies, startDate, endDate, ...row }: DetailRow) => ({
+const toAdminDetail = ({ technologies, images, startDate, endDate, ...row }: DetailRow) => ({
   ...row,
+  images: images.map(toAdminExperienceImage),
   startDate: toDateOnly(startDate),
   endDate: toDateOnly(endDate),
   technologyIds: technologies.map((t) => t.technologyId),
@@ -36,6 +38,7 @@ const toPublicItem = (row: PublicRow, lang: Lang) => ({
     slug: technology.slug,
     name: technology.name,
   })),
+  images: row.images.map((link) => toPublicImage(link.image, lang)),
 });
 
 // The resulting state, not just the patch, must be valid: a patch that empties a field of an
