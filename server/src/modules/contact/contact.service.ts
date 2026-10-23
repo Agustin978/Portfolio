@@ -1,6 +1,6 @@
 import { MailError, type Mailer, type OutgoingMail } from '../../shared/mail/mailer.js';
-import type { ContactRepository } from './contact.repository.js';
-import type { ContactInput } from './contact.schemas.js';
+import { contactMessageNotFound, type ContactRepository } from './contact.repository.js';
+import type { AdminListQuery, ContactInput } from './contact.schemas.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SUBJECT_NAME_MAX = 60;
@@ -69,6 +69,23 @@ export const createContactService = ({
   };
 
   return {
+    async list(query: AdminListQuery) {
+      const { items, total } = await repository.findPage(query);
+      return { items, meta: { count: items.length, total, page: query.page, limit: query.limit } };
+    },
+
+    async get(id: number) {
+      const message = await repository.findById(id);
+      if (!message) throw contactMessageNotFound();
+      return message;
+    },
+
+    setRead: (id: number, isRead: boolean) => repository.setRead(id, isRead),
+
+    async remove(id: number) {
+      await repository.remove(id);
+    },
+
     // The message is stored before anything else can go wrong. Whatever happens while emailing,
     // the visitor's request has succeeded: this never throws because of the mailer.
     async submit(input: ContactInput) {

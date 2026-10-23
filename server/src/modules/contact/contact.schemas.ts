@@ -43,3 +43,28 @@ export const isHoneypotFilled = (body: unknown): boolean => {
   if (value === undefined) return false;
   return !(typeof value === 'string' && value.trim() === '');
 };
+
+export const updateContactMessageBody = z.strictObject({ isRead: z.boolean() });
+
+export const LIST_LIMIT_DEFAULT = 20;
+export const LIST_LIMIT_MAX = 100;
+
+// Digits only: Number('') is 0 and Number('1e3') is 1000, neither of which should be accepted.
+const positiveInt = (max: number) =>
+  z
+    .string()
+    .regex(/^\d{1,9}$/)
+    .transform(Number)
+    .pipe(z.number().int().min(1).max(max));
+
+export const adminListQuery = z.object({
+  isRead: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : value === 'true')),
+  limit: positiveInt(LIST_LIMIT_MAX).default(LIST_LIMIT_DEFAULT),
+  page: positiveInt(1_000_000).default(1),
+});
+
+export type AdminListQuery = z.output<typeof adminListQuery>;
+export type UpdateContactMessageInput = z.output<typeof updateContactMessageBody>;

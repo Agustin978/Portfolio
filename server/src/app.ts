@@ -18,7 +18,10 @@ import {
 import { createCategoriesService } from './modules/categories/categories.service.js';
 import { createContactController } from './modules/contact/contact.controller.js';
 import { createContactRepository } from './modules/contact/contact.repository.js';
-import { createContactPublicRouter } from './modules/contact/contact.routes.js';
+import {
+  createContactAdminRouter,
+  createContactPublicRouter,
+} from './modules/contact/contact.routes.js';
 import { createContactService } from './modules/contact/contact.service.js';
 import { createImagesController } from './modules/images/images.controller.js';
 import { createImagesRepository } from './modules/images/images.repository.js';
@@ -127,6 +130,7 @@ const experienceImagesController = createImagesController(
 
 // Every private content module is registered here; createAdminRouter guards the whole group.
 export const adminMounts: AdminMount[] = [
+  { path: '/contact-messages', router: createContactAdminRouter(contactController) },
   { path: '/project-categories', router: createCategoriesAdminRouter(categoriesController) },
   { path: '/experiences', router: createExperiencesAdminRouter(experiencesController) },
   {
