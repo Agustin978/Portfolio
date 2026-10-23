@@ -3,6 +3,7 @@ import { createProjectsRepository } from '../src/modules/projects/projects.repos
 import { createProjectsService } from '../src/modules/projects/projects.service.js';
 import { AppError } from '../src/shared/errors/AppError.js';
 import {
+  attachImage,
   createCategory,
   createProject,
   createTestDb,
@@ -70,6 +71,7 @@ describe('projects service', () => {
 
   it('deactivate hides the project from public reads and reactivate brings it back', async () => {
     const project = await createProject(db, categoryId, published);
+    await attachImage(db, project.id);
     const repository = createProjectsRepository(db);
 
     await build().deactivate(project.id);

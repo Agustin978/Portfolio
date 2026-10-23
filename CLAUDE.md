@@ -50,7 +50,17 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 
 - **Desactivación lógica**: `projects` y `experiences` no se borran nunca; tienen `deactivated_at` (independiente de `status`). El service expone solo `deactivate` y `reactivate`. El repository aplica `deactivated_at IS NULL` en toda lectura pública y en el listado por defecto del panel. El slug es único incluyendo desactivados.
 - **Borrado real**: solo `contact_messages`. Categorías y tecnologías únicamente si no están en uso (RESTRICT, contando proyectos desactivados).
-- **Imágenes (se implementa en la Fase 4)**: una imagen se elimina solo al quitarla de un proyecto o experiencia. El service, en una transacción, borra el vínculo y la fila de `images` si queda sin vínculos; después, fuera de la transacción, borra el archivo en Cloudinary. Si Cloudinary falla, se registra el error y no se revierte nada.
+- **Imágenes** (Fase 4, hecho; módulo `server/src/modules/images/`, un solo service para proyectos y experiencias según `kind`): una imagen se elimina solo al quitarla de un proyecto o experiencia. El service, en una transacción, borra el vínculo y la fila de `images` si queda sin vínculos; después, fuera de la transacción, borra el archivo en Cloudinary. Si Cloudinary falla, se registra el error con el `public_id` y no se revierte nada.
+  - Solo hay subida directa a un proyecto o experiencia (`/admin/projects|experiences/:id/images`, montadas en `adminMounts`). Detalle y errores en `docs/api.md`.
+  - Orden de la subida: validar todo (Zod, 404, límite de 12 con 409) y procesar con sharp **antes** de llamar a Cloudinary; recién después subir y escribir en la base. Nunca mantener una transacción abierta durante la subida. Si la base falla, se borra el archivo recién subido.
+  - Concurrencia: toda escritura de imágenes bloquea la fila del dueño con `SELECT ... FOR UPDATE` (`images.repository.ts`, `transaction`). Las reglas (límite, portada, `COVER_REQUIRED`) viven en el service. Mover la portada pone la actual en false y después la nueva en true: el índice parcial único no se puede diferir.
+  - Procesamiento (`images.processing.ts`): sharp decide por los bytes (jpeg/png/webp; SVG y GIF fuera), rota por EXIF, máximo 1920 px, re-codifica a WebP sin `withMetadata()` (así se pierde el EXIF/GPS). Lo ilegible da 415, nunca 500. `width`/`height` guardados son los de la salida.
+  - Cloudinary solo se toca desde `shared/storage/` (interfaz `ImageStorage` con `upload` y `destroy`). `public_id` lo genera el servidor; carpeta `portfolio/<NODE_ENV>`. Los textos de error del proveedor van al log, nunca al cliente (502 `IMAGE_UPLOAD_FAILED`). `CLOUDINARY_*` son obligatorias solo en producción; en local una subida responde 503 `STORAGE_NOT_CONFIGURED`.
+  - Portada de proyectos: la primera imagen queda como portada y todo proyecto con imágenes tiene exactamente una. Publicar exige portada (`422 MISSING_COVER`, también al reactivar un proyecto publicado); quitar la última imagen de un proyecto publicado y activo da `409 COVER_REQUIRED`. Las experiencias no tienen portada.
+  - **Limpiar huérfanos a mano**: si un borrado en Cloudinary falla, el log trae el `public_id`. Para limpiar en bloque, abrir el panel de Cloudinary, carpeta `portfolio/<entorno>` (Media Library), y borrar los archivos cuyo `public_id` no figure en `images.cloudinary_public_id` (`SELECT cloudinary_public_id FROM images`).
+  - Tests: usan un doble de `ImageStorage` (`tests/helpers/fakeStorage.ts`, enchufado con `vi.mock` de `shared/storage/index.js`); sin red ni credenciales. La prueba real contra Cloudinary es manual, con las credenciales del `.env`.
+  - Las variantes de imagen se piden por URL (`f_auto,q_auto,w_<ancho>`) con un conjunto fijo de anchos (400, 800, 1200, 1920): cada variante nueva consume cuota gratuita la primera vez.
+  - No existen columnas para foto de perfil ni logo de empresa (`profile` y `experiences` no las tienen): quedaron fuera de la Fase 4. Agregarlas requiere una migración nueva, con aprobación.
 - **API de contenido (Fase 3)**: no existe DELETE de proyectos ni experiencias; son `PATCH .../deactivate` y `PATCH .../reactivate`.
 - **Contrato de la API**: ejemplos de cada endpoint en `docs/api.md` (actualizarlo en cada fase). Públicos en `/api/v1/...` con `?lang`; privados bajo `/api/v1/admin/...`, montados en `adminMounts` de `app.ts`: `createAdminRouter` aplica `requireAuth` y `no-store` una sola vez, y un test recorre todas las rutas de `/admin` verificando el 401. Los públicos usan `select` explícito (lista blanca) en el repository. Los PATCH son parciales con `z.strictObject`. Los errores de restricción de la base se traducen con `guarded` (`shared/db/guarded.ts`) en el repository: P2002 a 409, P2003 a 409 (borrar en uso) o 422 (referencia inexistente al escribir), P2025 a 404; nunca 500.
 - Redes sociales: sin borrado físico, se ocultan con `isVisible`.
@@ -90,12 +100,13 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 
 ## Estado actual y próximos pasos
 
-_Última actualización: 2026-10-21._
+_Última actualización: 2026-10-22._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
 - Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
-- Fase 3: API de contenido. Primera rama (`feature/content-catalog`) fusionada en `dev` (PR #4). Segunda rama (`feature/content-projects-experiences`: proyectos, experiencias, `/skills`; 183 tests pasan) pendiente de PR hacia `dev`.
+- Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
+- Fase 4: imágenes hechas en la rama `feature/images` (266 tests pasan), pendiente de PR hacia `dev` y de la prueba manual contra Cloudinary real.
 - En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: Fase 4 (imágenes con Cloudinary: multer, sharp, cloudinary). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
-- Diferido: borrado de imágenes con Cloudinary (Fase 4), tal como se describe en la sección Datos.
+- Siguiente: Fase 5 (contacto: formulario, guardado primero, email con Resend después, rate limit con `createRateLimiter`). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.

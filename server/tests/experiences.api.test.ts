@@ -65,12 +65,50 @@ describe('GET /api/v1/experiences (public)', () => {
       'description',
       'endDate',
       'id',
+      'images',
       'location',
       'role',
       'startDate',
       'technologies',
     ]);
     expect(JSON.stringify(res.body)).not.toMatch(/roleEs|descriptionEn|status|deactivated/);
+  });
+
+  it('lists the images in order with only url, size and translated alt', async () => {
+    const experience = await db.experience.create({ data: publishedRow({ company: 'Pics' }) });
+    const add = async (
+      n: number,
+      sortOrder: number,
+      altEs: string | null,
+      altEn: string | null,
+    ) => {
+      const image = await db.image.create({
+        data: {
+          cloudinaryPublicId: `portfolio/test/e-${n}`,
+          url: `https://res.cloudinary.test/e-${n}.webp`,
+          width: 640,
+          height: 480,
+          altEs,
+          altEn,
+        },
+      });
+      await db.experienceImage.create({
+        data: { experienceId: experience.id, imageId: image.id, sortOrder },
+      });
+    };
+    await add(2, 1, 'segunda', null);
+    await add(1, 0, 'primera', 'first');
+
+    const es = await request(app).get('/api/v1/experiences');
+    const en = await request(app).get('/api/v1/experiences?lang=en');
+
+    expect(es.body.data[0].images.map((i: { alt: string }) => i.alt)).toEqual([
+      'primera',
+      'segunda',
+    ]);
+    expect(en.body.data[0].images.map((i: { alt: string }) => i.alt)).toEqual(['first', 'segunda']);
+    expect(keys(es.body.data[0].images[0])).toEqual(['alt', 'height', 'url', 'width']);
+    expect(JSON.stringify(es.body)).not.toMatch(/portfolio\/test|cloudinary_public|isCover/i);
   });
 
   it('translates to the requested language and rejects an invalid lang', async () => {
@@ -166,6 +204,7 @@ describe('POST /api/v1/admin/experiences', () => {
       'descriptionEs',
       'endDate',
       'id',
+      'images',
       'location',
       'roleEn',
       'roleEs',
@@ -385,5 +424,44 @@ describe('admin listing, deactivation and deletion', () => {
       404,
     );
     expect(await db.experience.count()).toBe(1);
+  });
+});
+
+describe('experience images in the admin detail', () => {
+  it('lists them in order, without a cover flag, and not in the admin list', async () => {
+    const experience = await db.experience.create({
+      data: { company: 'Pics', startDate: new Date('2023-01-01') },
+    });
+    for (const [n, sortOrder] of [
+      [1, 1],
+      [2, 0],
+    ] as const) {
+      const image = await db.image.create({
+        data: {
+          cloudinaryPublicId: `portfolio/test/a-${n}`,
+          url: `https://res.cloudinary.test/a-${n}.webp`,
+          width: 10,
+          height: 10,
+        },
+      });
+      await db.experienceImage.create({
+        data: { experienceId: experience.id, imageId: image.id, sortOrder },
+      });
+    }
+
+    const detail = await getAdmin(experience.id);
+    const list = await request(app).get(admin).set('Cookie', cookie);
+
+    expect(detail.body.data.images.map((i: { sortOrder: number }) => i.sortOrder)).toEqual([0, 1]);
+    expect(keys(detail.body.data.images[0])).toEqual([
+      'altEn',
+      'altEs',
+      'height',
+      'id',
+      'sortOrder',
+      'url',
+      'width',
+    ]);
+    expect(list.body.data[0]).not.toHaveProperty('images');
   });
 });

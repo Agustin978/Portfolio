@@ -46,6 +46,33 @@ export async function createProject(
   });
 }
 
+// A project can only be published (or reactivated while published) with a cover, so tests that
+// need a live project attach this stand-in instead of going through the upload flow.
+export async function attachImage(
+  db: TestDb,
+  projectId: number,
+  {
+    isCover = true,
+    sortOrder = 0,
+    altEs = null,
+    altEn = null,
+  }: { isCover?: boolean; sortOrder?: number; altEs?: string | null; altEn?: string | null } = {},
+) {
+  const n = uniq();
+  const image = await db.image.create({
+    data: {
+      cloudinaryPublicId: `portfolio/test/seed-${n}`,
+      url: `https://res.cloudinary.test/seed-${n}.webp`,
+      width: 1200,
+      height: 800,
+      altEs,
+      altEn,
+    },
+  });
+  await db.projectImage.create({ data: { projectId, imageId: image.id, sortOrder, isCover } });
+  return image;
+}
+
 export const fullProjectCopy = {
   titleEs: 'Título',
   titleEn: 'Title',

@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { app } from '../src/app.js';
 import { createAdminSession } from './helpers/auth.js';
 import {
+  attachImage,
   createCategory,
   createProject,
   createTestDb,
@@ -45,6 +46,14 @@ const completeBody = () => ({
   status: 'published',
 });
 
+// Publishing needs a cover, and a brand-new project has none: create the draft, attach an
+// image, then publish. Returns the published admin detail.
+const createLive = async (overrides: object = {}) => {
+  const draft = (await post({ ...completeBody(), status: 'draft', ...overrides })).body.data;
+  await attachImage(db, draft.id);
+  return (await patch(draft.id, { status: 'published' })).body.data;
+};
+
 const createTechnology = (slug: string, sortOrder = 0) =>
   db.technology.create({ data: { slug, name: slug.toUpperCase(), sortOrder } });
 
@@ -65,6 +74,7 @@ describe('GET /api/v1/projects (public)', () => {
     expect(res.body.meta).toEqual({ count: 1 });
     expect(keys(res.body.data[0])).toEqual([
       'category',
+      'cover',
       'endedAt',
       'isFeatured',
       'liveUrl',
@@ -141,6 +151,86 @@ describe('GET /api/v1/projects (public)', () => {
   });
 });
 
+describe('project images in responses', () => {
+  const imageKeys = ['alt', 'height', 'url', 'width'];
+
+  it('puts the cover in the list and every image, in order, in the detail', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'pics' });
+    await attachImage(db, project.id, { sortOrder: 2, isCover: false, altEs: 'tercera' });
+    await attachImage(db, project.id, { sortOrder: 0, isCover: true, altEs: 'portada' });
+    await attachImage(db, project.id, { sortOrder: 1, isCover: false, altEs: 'segunda' });
+
+    const list = await request(app).get('/api/v1/projects');
+    const detail = await request(app).get('/api/v1/projects/pics');
+
+    expect(keys(list.body.data[0].cover)).toEqual(imageKeys);
+    expect(list.body.data[0].cover).toMatchObject({ alt: 'portada', width: 1200, height: 800 });
+    expect(list.body.data[0]).not.toHaveProperty('images');
+    expect(detail.body.data.cover.alt).toBe('portada');
+    expect(detail.body.data.images.map((i: { alt: string }) => i.alt)).toEqual([
+      'portada',
+      'segunda',
+      'tercera',
+    ]);
+    expect(keys(detail.body.data.images[0])).toEqual(imageKeys);
+  });
+
+  it('translates alt text with a Spanish fallback and null when both are missing', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'alts' });
+    await attachImage(db, project.id, { sortOrder: 0, altEs: 'solo es' });
+    await attachImage(db, project.id, { sortOrder: 1, isCover: false, altEs: 'a', altEn: 'b' });
+    await attachImage(db, project.id, { sortOrder: 2, isCover: false });
+
+    const en = await request(app).get('/api/v1/projects/alts?lang=en');
+    const es = await request(app).get('/api/v1/projects/alts');
+
+    expect(en.body.data.images.map((i: { alt: string | null }) => i.alt)).toEqual([
+      'solo es',
+      'b',
+      null,
+    ]);
+    expect(es.body.data.images.map((i: { alt: string | null }) => i.alt)).toEqual([
+      'solo es',
+      'a',
+      null,
+    ]);
+  });
+
+  it('never exposes storage details', async () => {
+    const project = await createProject(db, categoryId, { ...published, slug: 'safe' });
+    await attachImage(db, project.id);
+
+    const res = await request(app).get('/api/v1/projects/safe');
+
+    expect(JSON.stringify(res.body)).not.toMatch(
+      /portfolio\/test|cloudinaryPublicId|publicId|isCover/i,
+    );
+  });
+
+  it('adds the images to the admin detail but not to the admin list', async () => {
+    const project = await createProject(db, categoryId, { slug: 'adm' });
+    const second = await attachImage(db, project.id, { sortOrder: 1, isCover: false });
+    const first = await attachImage(db, project.id, { sortOrder: 0, altEn: 'Cover' });
+
+    const detail = await getAdmin(project.id);
+    const list = await request(app).get(admin).set('Cookie', cookie);
+
+    expect(detail.body.data.images.map((i: { id: number }) => i.id)).toEqual([first.id, second.id]);
+    expect(keys(detail.body.data.images[0])).toEqual([
+      'altEn',
+      'altEs',
+      'height',
+      'id',
+      'isCover',
+      'sortOrder',
+      'url',
+      'width',
+    ]);
+    expect(detail.body.data.images[0]).toMatchObject({ isCover: true, altEn: 'Cover' });
+    expect(list.body.data[0]).not.toHaveProperty('images');
+  });
+});
+
 describe('GET /api/v1/projects/:slug (public)', () => {
   it('returns the detail keys, the list keys plus description', async () => {
     await createProject(db, categoryId, { ...published, slug: 'one' });
@@ -150,8 +240,10 @@ describe('GET /api/v1/projects/:slug (public)', () => {
     expect(res.status).toBe(200);
     expect(keys(res.body.data)).toEqual([
       'category',
+      'cover',
       'description',
       'endedAt',
+      'images',
       'isFeatured',
       'liveUrl',
       'repoUrl',
@@ -216,6 +308,7 @@ describe('POST /api/v1/admin/projects', () => {
       'descriptionEs',
       'endedAt',
       'id',
+      'images',
       'isFeatured',
       'liveUrl',
       'publishedAt',
@@ -233,12 +326,12 @@ describe('POST /api/v1/admin/projects', () => {
     ]);
   });
 
-  it('publishes a complete project and stamps publishedAt', async () => {
+  it('cannot be created already published: a new project has no cover yet', async () => {
     const res = await post(completeBody());
 
-    expect(res.status).toBe(201);
-    expect(res.body.data.status).toBe('published');
-    expect(res.body.data.publishedAt).toEqual(expect.any(String));
+    expect(res.status).toBe(422);
+    expect(res.body.error.code).toBe('MISSING_COVER');
+    expect(await db.project.count()).toBe(0);
   });
 
   it('answers an incomplete publication with 422 naming the missing fields', async () => {
@@ -341,7 +434,7 @@ describe('PATCH /api/v1/admin/projects/:id', () => {
   });
 
   it('validates the resulting state: emptying a required field of a published project is a 422', async () => {
-    const created = (await post(completeBody())).body.data;
+    const created = await createLive();
 
     const blank = await patch(created.id, { titleEn: '   ' });
     const nulled = await patch(created.id, { summaryEs: null, descriptionEs: '' });
@@ -353,8 +446,38 @@ describe('PATCH /api/v1/admin/projects/:id', () => {
     expect((await getAdmin(created.id)).body.data.titleEn).toBe('Title');
   });
 
+  it('publishes a complete draft that has a cover and stamps publishedAt', async () => {
+    const draft = (await post({ ...completeBody(), status: 'draft' })).body.data;
+    await attachImage(db, draft.id);
+
+    const res = await patch(draft.id, { status: 'published' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.status).toBe('published');
+    expect(res.body.data.publishedAt).toEqual(expect.any(String));
+  });
+
+  it('answers 422 MISSING_COVER when publishing a complete draft without images', async () => {
+    const draft = (await post({ ...completeBody(), status: 'draft' })).body.data;
+
+    const res = await patch(draft.id, { status: 'published' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.code).toBe('MISSING_COVER');
+    expect((await getAdmin(draft.id)).body.data.status).toBe('draft');
+  });
+
+  it('reports incomplete copy before the missing cover', async () => {
+    const draft = (await post({ slug: 'p', categoryId })).body.data;
+
+    const res = await patch(draft.id, { status: 'published' });
+
+    expect(res.body.error.code).toBe('INCOMPLETE_TRANSLATION');
+  });
+
   it('publishing a draft needs the whole state to be complete, not just the patch', async () => {
     const created = (await post({ slug: 'p', categoryId, titleEs: 'Uno' })).body.data;
+    await attachImage(db, created.id);
 
     const incomplete = await patch(created.id, { status: 'published' });
     const complete = await patch(created.id, {
@@ -373,7 +496,7 @@ describe('PATCH /api/v1/admin/projects/:id', () => {
   });
 
   it('unpublishing never needs completeness and keeps publishedAt', async () => {
-    const created = (await post(completeBody())).body.data;
+    const created = await createLive();
 
     const unpublished = await patch(created.id, { status: 'draft', titleEn: '' });
     const republished = await patch(created.id, { status: 'published', titleEn: 'Title' });
@@ -395,7 +518,7 @@ describe('PATCH /api/v1/admin/projects/:id', () => {
 
   it('locks the slug once published but allows changing it before, and re-sending it', async () => {
     const draft = (await post({ slug: 'draft-slug', categoryId })).body.data;
-    const live = (await post(completeBody())).body.data;
+    const live = await createLive();
 
     const renamedDraft = await patch(draft.id, { slug: 'renamed' });
     const locked = await patch(live.id, { slug: 'other-slug' });
@@ -409,7 +532,7 @@ describe('PATCH /api/v1/admin/projects/:id', () => {
   });
 
   it('keeps the slug locked after unpublishing', async () => {
-    const live = (await post(completeBody())).body.data;
+    const live = await createLive();
     await patch(live.id, { status: 'draft' });
 
     expect((await patch(live.id, { slug: 'other-slug' })).status).toBe(409);
@@ -517,7 +640,7 @@ describe('admin listing, deactivation and deletion', () => {
   });
 
   it('deactivates and reactivates through PATCH, hiding it from the public API meanwhile', async () => {
-    const created = (await post(completeBody())).body.data;
+    const created = await createLive();
 
     const off = await request(app).patch(`${admin}/${created.id}/deactivate`).set('Cookie', cookie);
     expect(off.status).toBe(200);
@@ -539,6 +662,25 @@ describe('admin listing, deactivation and deletion', () => {
       .patch(`${admin}/${created.id}/reactivate`)
       .set('Cookie', cookie);
     expect(notOff.status).toBe(409);
+  });
+
+  it('lets a deactivated published project lose its cover but not come back without one', async () => {
+    const live = await createLive();
+    await request(app).patch(`${admin}/${live.id}/deactivate`).set('Cookie', cookie);
+    await db.projectImage.deleteMany({ where: { projectId: live.id } });
+
+    const edit = await patch(live.id, { titleEn: 'Still editable' });
+    const blocked = await request(app)
+      .patch(`${admin}/${live.id}/reactivate`)
+      .set('Cookie', cookie);
+    await attachImage(db, live.id);
+    const back = await request(app).patch(`${admin}/${live.id}/reactivate`).set('Cookie', cookie);
+
+    expect(edit.status).toBe(200);
+    expect(blocked.status).toBe(422);
+    expect(blocked.body.error.code).toBe('MISSING_COVER');
+    expect(back.status).toBe(200);
+    expect(back.body.data.deactivatedAt).toBeNull();
   });
 
   it('404s on unknown ids and has no DELETE route', async () => {
