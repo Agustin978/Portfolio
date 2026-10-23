@@ -16,6 +16,10 @@ import {
   createCategoriesPublicRouter,
 } from './modules/categories/categories.routes.js';
 import { createCategoriesService } from './modules/categories/categories.service.js';
+import { createContactController } from './modules/contact/contact.controller.js';
+import { createContactRepository } from './modules/contact/contact.repository.js';
+import { createContactPublicRouter } from './modules/contact/contact.routes.js';
+import { createContactService } from './modules/contact/contact.service.js';
 import { createImagesController } from './modules/images/images.controller.js';
 import { createImagesRepository } from './modules/images/images.repository.js';
 import { createImagesAdminRouter } from './modules/images/images.routes.js';
@@ -106,6 +110,10 @@ const experiencesController = createExperiencesController(
   createExperiencesService(createExperiencesRepository(getPrisma())),
 );
 
+const contactController = createContactController(
+  createContactService({ repository: createContactRepository(getPrisma()) }),
+);
+
 const imagesRepository = createImagesRepository(getPrisma());
 const projectImagesController = createImagesController(
   createImagesService({ repository: imagesRepository, storage: imageStorage, kind: 'project' }),
@@ -132,6 +140,15 @@ export const adminMounts: AdminMount[] = [
 ];
 
 app.use('/api/v1/health', healthRouter);
+app.use(
+  '/api/v1/contact',
+  noStore,
+  createContactPublicRouter({
+    controller: contactController,
+    // Successful sends count too: the limit exists to stop a bot from filling the inbox.
+    rateLimiter: createRateLimiter({ limit: 5, windowMs: 60 * 60 * 1000 }),
+  }),
+);
 app.use('/api/v1/experiences', createExperiencesPublicRouter(experiencesController));
 app.use('/api/v1/profile', createProfilePublicRouter(profileController));
 app.use('/api/v1/skills', createSkillsPublicRouter(technologiesController));
