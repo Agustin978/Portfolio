@@ -1,6 +1,6 @@
 # Contrato de la API
 
-Base: `/api/v1`. Los ejemplos muestran la forma exacta de cada respuesta. Los campos solo se agregan, no se quitan (la Fase 4 sumó imágenes: solo agregó campos y endpoints).
+Base: `/api/v1`. Los ejemplos muestran la forma exacta de cada respuesta. Los campos solo se agregan, no se quitan (la Fase 4 sumó imágenes y la Fase 5 el contacto: solo agregaron campos y endpoints).
 
 ## Convenciones
 
@@ -233,6 +233,39 @@ Solo las visibles.
   "meta": { "count": 2 }
 }
 ```
+
+### `POST /contact`
+
+Formulario de contacto. Sin sesión. Primero se guarda el mensaje y después se envía el correo, dentro del mismo request y con un timeout de 5 s.
+
+```json
+{
+  "name": "Ana Pérez",
+  "email": "ana@example.com",
+  "message": "Hola, me gustaría hablar de un proyecto.",
+  "lang": "es",
+  "hp_check": ""
+}
+```
+
+Respuesta (`201`), siempre la misma:
+
+```json
+{ "success": true, "data": { "received": true }, "meta": {} }
+```
+
+- `name`: 1 a 100 caracteres, en una sola línea y sin caracteres de control. `email`: se normaliza (espacios y minúsculas), hasta 254. `message`: 10 a 5000 caracteres; admite saltos de línea, pero no el carácter NUL. `lang`: `es` o `en` (por defecto `es`). Lo que se manda se recorta (`trim`); claves desconocidas dan `400 VALIDATION_ERROR`.
+- **El `201` no dice si el correo salió.** Si Resend falla, tarda más de 5 s, no está configurado o ya se enviaron 50 correos en 24 h, el mensaje queda guardado igual y la respuesta es la misma. El estado real (`emailStatus`, `emailError`) solo se ve en el panel.
+- **Límite**: 5 envíos por hora por IP, contando también los exitosos: `429 RATE_LIMITED`. El cliente debe mostrar un aviso genérico.
+- **Honeypot `hp_check`**: campo trampa que una persona nunca ve. Si llega con cualquier valor que no sea vacío, la API responde el mismo `201` sin guardar nada ni enviar correo, aunque el resto del body sea inválido. El campo del cliente debe ser invisible para personas y lectores de pantalla, y no debe autocompletarse:
+
+  ```html
+  <input type="text" name="hp_check" autocomplete="off" tabindex="-1" aria-hidden="true" />
+  ```
+
+  Ocultarlo con CSS (fuera de pantalla), no con `type="hidden"` ni `display: none`, que algunos bots detectan. Enviarlo siempre, vacío si no se tocó. No darle un nombre atractivo para bots (`website`, `url`, `phone`).
+
+- `403 FORBIDDEN_ORIGIN` si el `Origin` no es el del cliente.
 
 ---
 
@@ -530,3 +563,38 @@ Registro único creado por el seed: solo `GET /` y `PATCH /`.
 
 - `platform` es la clave del icono (minúsculas, dígitos y guiones) y es única: `409 PLATFORM_TAKEN`.
 - `url` solo `http(s)`.
+
+### Mensajes de contacto: `/admin/contact-messages`
+
+`GET /`, `GET /:id`, `PATCH /:id` (solo `isRead`), `DELETE /:id`. Es el único borrado real de la API: guarda datos personales y no es contenido.
+
+`GET /` acepta `?isRead=true|false`, `?limit=` (1 a 100, por defecto 20) y `?page=` (desde 1, por defecto 1); cualquier otro valor da 400. Orden: más nuevos primero (`createdAt` y desempate por `id`, descendentes). No trae el cuerpo del mensaje.
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 7,
+      "name": "Ana Pérez",
+      "email": "ana@example.com",
+      "lang": "es",
+      "emailStatus": "sent",
+      "sentAt": "2026-10-23T12:00:03.000Z",
+      "isRead": false,
+      "createdAt": "2026-10-23T12:00:00.000Z"
+    }
+  ],
+  "meta": { "count": 1, "total": 1, "page": 1, "limit": 20 }
+}
+```
+
+`total` cuenta las filas que cumplen el filtro, no la página. Una página pasada del final da `data: []` con el total real.
+
+`GET /:id` y `PATCH /:id` devuelven el detalle: lo anterior más `message` y `emailError`.
+
+- `emailStatus`: `pending` (guardado, sin resultado de envío), `sent` o `failed`.
+- `emailError` es un código corto, nunca texto del proveedor: `not configured` (sin credenciales de Resend), `timeout` (pasaron 5 s; **el correo pudo haber salido**), `daily_cap` (ya había 50 correos enviados en 24 h; se guardó sin enviar), `send_failed` o `send_failed:<código de Resend>`.
+- Un envío con `emailStatus: "failed"` no se reintenta solo. Se atiende leyendo el mensaje en el panel.
+- `PATCH` acepta únicamente `{ "isRead": true|false }`.
+- `DELETE`: `200` con `data: null`. `404 CONTACT_MESSAGE_NOT_FOUND` si no existe.
