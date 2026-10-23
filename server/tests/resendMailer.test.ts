@@ -25,7 +25,7 @@ describe('createResendMailer', () => {
       },
       { idempotencyKey: 'contact-7' },
     );
-    expect(send.mock.calls[0][0]).not.toHaveProperty('html');
+    expect(send.mock.calls[0]?.[0]).not.toHaveProperty('html');
   });
 
   it('keeps only the provider error name, never its message', async () => {
