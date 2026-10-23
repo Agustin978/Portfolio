@@ -13,9 +13,31 @@ const withoutVisitorData = async <T>(operation: () => Promise<T>): Promise<T> =>
   }
 };
 
+export type ContactOutcome = { emailStatus: 'failed'; emailError: string };
+
 export const createContactRepository = (db: PrismaClient) => ({
-  create: (input: ContactInput) =>
-    withoutVisitorData(() => db.contactMessage.create({ data: input, select: { id: true } })),
+  // Without an outcome the row starts as pending, the column default.
+  create: (input: ContactInput, outcome?: ContactOutcome) =>
+    withoutVisitorData(() =>
+      db.contactMessage.create({ data: { ...input, ...outcome }, select: { id: true } }),
+    ),
+
+  markSent: (id: number, sentAt: Date) =>
+    db.contactMessage.update({
+      where: { id },
+      data: { emailStatus: 'sent', sentAt, emailError: null },
+      select: { id: true },
+    }),
+
+  markFailed: (id: number, emailError: string) =>
+    db.contactMessage.update({
+      where: { id },
+      data: { emailStatus: 'failed', emailError },
+      select: { id: true },
+    }),
+
+  countSentSince: (since: Date) =>
+    db.contactMessage.count({ where: { emailStatus: 'sent', sentAt: { gte: since } } }),
 });
 
 export type ContactRepository = ReturnType<typeof createContactRepository>;

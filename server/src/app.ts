@@ -65,6 +65,7 @@ import {
 import { createExperiencesService } from './modules/experiences/experiences.service.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { getPrisma } from './shared/db/index.js';
+import { mailer } from './shared/mail/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
 import { noStore } from './shared/middlewares/noStore.js';
 import { createOriginGuard } from './shared/middlewares/originGuard.js';
@@ -111,7 +112,7 @@ const experiencesController = createExperiencesController(
 );
 
 const contactController = createContactController(
-  createContactService({ repository: createContactRepository(getPrisma()) }),
+  createContactService({ repository: createContactRepository(getPrisma()), mailer }),
 );
 
 const imagesRepository = createImagesRepository(getPrisma());

@@ -1,15 +1,26 @@
 import request from 'supertest';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../src/app.js';
+import { fakeMailer } from './helpers/fakeMailer.js';
 import { createTestDb, resetDb, type TestDb } from './helpers/testDb.js';
 
+vi.mock('../src/shared/mail/index.js', async () => ({
+  mailer: (await import('./helpers/fakeMailer.js')).fakeMailer,
+}));
+
 let db: TestDb;
+let errorSpy: ReturnType<typeof vi.spyOn>;
 
 beforeAll(() => {
   db = createTestDb();
 });
 afterAll(() => db.$disconnect());
-beforeEach(() => resetDb(db));
+beforeEach(async () => {
+  await resetDb(db);
+  fakeMailer.reset();
+  errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+});
+afterEach(() => errorSpy.mockRestore());
 
 // Each call gets its own client IP so the 5-per-hour limit never leaks between tests.
 let ipCounter = 0;
@@ -151,6 +162,58 @@ describe('POST /api/v1/contact', () => {
       expect((await submit({ ...valid, hp_check: '' })).status).toBe(201);
       expect((await submit({ ...valid, hp_check: '   ' })).status).toBe(201);
       expect(await db.contactMessage.count()).toBe(2);
+    });
+  });
+
+  describe('email delivery', () => {
+    it('emails the owner and marks the row sent', async () => {
+      const res = await submit({ ...valid, lang: 'en' });
+
+      expect(res.status).toBe(201);
+      expect(fakeMailer.sent).toHaveLength(1);
+      expect(fakeMailer.sent[0]!.mail.replyTo).toBe('ana@example.com');
+      expect(fakeMailer.sent[0]!.mail.text).toContain(valid.message);
+      expect((await db.contactMessage.findFirstOrThrow()).emailStatus).toBe('sent');
+    });
+
+    it('still answers 201 and keeps the message when the email fails', async () => {
+      fakeMailer.failWith = 'send_failed:validation_error';
+
+      const res = await submit(valid);
+
+      expect(res.status).toBe(201);
+      expect(res.body.data).toEqual({ received: true });
+      expect(await db.contactMessage.findFirstOrThrow()).toMatchObject({
+        emailStatus: 'failed',
+        emailError: 'send_failed:validation_error',
+      });
+    });
+
+    it('does not email trapped or invalid submissions', async () => {
+      await submit({ ...valid, hp_check: 'spam' });
+      await submit({ ...valid, email: 'nope' });
+
+      expect(fakeMailer.send).not.toHaveBeenCalled();
+    });
+
+    it('saves without emailing once 50 messages went out in the last 24 hours', async () => {
+      await db.contactMessage.createMany({
+        data: Array.from({ length: 50 }, () => ({
+          name: 'x',
+          email: 'x@example.com',
+          message: 'previous message',
+          emailStatus: 'sent' as const,
+          sentAt: new Date(),
+        })),
+      });
+
+      const res = await submit(valid);
+
+      expect(res.status).toBe(201);
+      expect(res.body.data).toEqual({ received: true });
+      expect(fakeMailer.send).not.toHaveBeenCalled();
+      const row = await db.contactMessage.findFirstOrThrow({ orderBy: { id: 'desc' } });
+      expect(row).toMatchObject({ emailStatus: 'failed', emailError: 'daily_cap' });
     });
   });
 
