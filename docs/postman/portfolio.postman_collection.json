@@ -81,12 +81,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
             }
           },
           "event": [
@@ -94,9 +90,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -118,13 +112,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
             },
             "description": "Deja la cookie `session` (8 h). 5 intentos fallidos cada 15 min por IP dan 429.",
             "body": {
@@ -142,9 +131,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -156,13 +143,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "me"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
             }
           },
           "event": [
@@ -170,9 +152,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -194,13 +174,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories"]
             },
             "body": {
               "mode": "raw",
@@ -236,13 +211,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories"]
             }
           },
           "event": [
@@ -250,9 +220,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -264,14 +232,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories/{{categoryId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories",
-                "{{categoryId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories", "{{categoryId}}"]
             }
           },
           "event": [
@@ -279,9 +241,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -298,14 +258,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories/{{categoryId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories",
-                "{{categoryId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories", "{{categoryId}}"]
             },
             "body": {
               "mode": "raw",
@@ -322,9 +276,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -341,13 +293,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories"]
             },
             "body": {
               "mode": "raw",
@@ -382,14 +329,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/project-categories/{{tempCategoryId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "project-categories",
-                "{{tempCategoryId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "project-categories", "{{tempCategoryId}}"]
             },
             "description": "Una categoría en uso da 409 CATEGORY_IN_USE."
           },
@@ -398,9 +339,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -422,13 +361,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/technologies",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "technologies"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "technologies"]
             },
             "body": {
               "mode": "raw",
@@ -468,13 +402,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/technologies",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "technologies"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "technologies"]
             },
             "body": {
               "mode": "raw",
@@ -509,13 +438,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/technologies",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "technologies"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "technologies"]
             }
           },
           "event": [
@@ -523,9 +447,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -542,14 +464,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/technologies/{{technologyId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "technologies",
-                "{{technologyId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "technologies", "{{technologyId}}"]
             },
             "body": {
               "mode": "raw",
@@ -566,9 +482,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -590,13 +504,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects"]
             },
             "body": {
               "mode": "raw",
@@ -637,14 +546,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}"]
             },
             "body": {
               "mode": "raw",
@@ -661,9 +564,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -680,14 +581,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}"]
             },
             "body": {
               "mode": "raw",
@@ -719,14 +614,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}"]
             }
           },
           "event": [
@@ -734,9 +623,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -748,13 +635,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects"]
             }
           },
           "event": [
@@ -762,9 +644,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -782,15 +662,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/images",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "images"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "images"]
             },
             "body": {
               "mode": "formdata",
@@ -837,15 +710,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/images",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "images"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "images"]
             },
             "body": {
               "mode": "formdata",
@@ -897,16 +763,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/images/{{imageId2}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "images",
-                "{{imageId2}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "images", "{{imageId2}}"]
             },
             "body": {
               "mode": "raw",
@@ -923,9 +781,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -942,16 +798,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/images/{{imageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "images",
-                "{{imageId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "images", "{{imageId}}"]
             },
             "body": {
               "mode": "raw",
@@ -968,9 +816,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -987,14 +833,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}"]
             },
             "body": {
               "mode": "raw",
@@ -1011,9 +851,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1025,16 +863,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/images/{{imageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "images",
-                "{{imageId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "images", "{{imageId}}"]
             },
             "description": "Borra la fila y el archivo en Cloudinary. Quitar la última imagen de un proyecto publicado da 409 COVER_REQUIRED."
           },
@@ -1043,9 +873,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1063,15 +891,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/deactivate",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "deactivate"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "deactivate"]
             }
           },
           "event": [
@@ -1079,9 +900,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1093,13 +912,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects?includeDeactivated=true",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects"],
               "query": [
                 {
                   "key": "includeDeactivated",
@@ -1113,9 +927,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1127,15 +939,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/projects/{{projectId}}/reactivate",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "projects",
-                "{{projectId}}",
-                "reactivate"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "projects", "{{projectId}}", "reactivate"]
             }
           },
           "event": [
@@ -1143,9 +948,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1167,13 +970,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/experiences",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "experiences"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "experiences"]
             },
             "body": {
               "mode": "raw",
@@ -1213,14 +1011,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/experiences/{{experienceId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "experiences",
-                "{{experienceId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "experiences", "{{experienceId}}"]
             },
             "body": {
               "mode": "raw",
@@ -1237,9 +1029,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1251,15 +1041,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/experiences/{{experienceId}}/images",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "experiences",
-                "{{experienceId}}",
-                "images"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "experiences", "{{experienceId}}", "images"]
             },
             "body": {
               "mode": "formdata",
@@ -1311,9 +1094,7 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/experiences/{{experienceId}}/images/{{experienceImageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
+              "host": ["{{baseUrl}}"],
               "path": [
                 "admin",
                 "experiences",
@@ -1337,9 +1118,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1351,14 +1130,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/experiences/{{experienceId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "experiences",
-                "{{experienceId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "experiences", "{{experienceId}}"]
             }
           },
           "event": [
@@ -1366,9 +1139,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1385,13 +1156,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/profile",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "profile"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile"]
             }
           },
           "event": [
@@ -1399,9 +1165,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1418,13 +1182,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/profile",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "profile"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile"]
             },
             "body": {
               "mode": "raw",
@@ -1441,9 +1200,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1460,13 +1217,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/social-links",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "social-links"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "social-links"]
             },
             "description": "`platform` es único: la segunda vez da 409 PLATFORM_TAKEN.",
             "body": {
@@ -1502,13 +1254,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/social-links",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "social-links"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "social-links"]
             }
           },
           "event": [
@@ -1516,9 +1263,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1535,14 +1280,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/social-links/{{socialLinkId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "social-links",
-                "{{socialLinkId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "social-links", "{{socialLinkId}}"]
             },
             "body": {
               "mode": "raw",
@@ -1559,9 +1298,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1578,12 +1315,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/profile?lang=en",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "profile"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"],
               "query": [
                 {
                   "key": "lang",
@@ -1597,9 +1330,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1611,12 +1342,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/projects?lang=es",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"],
               "query": [
                 {
                   "key": "lang",
@@ -1630,9 +1357,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1644,12 +1369,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/projects?lang=es&category={{categorySlug}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"],
               "query": [
                 {
                   "key": "lang",
@@ -1667,9 +1388,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1681,13 +1400,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/projects/{{projectSlug}}?lang=en",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectSlug}}"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectSlug}}"],
               "query": [
                 {
                   "key": "lang",
@@ -1701,9 +1415,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1715,12 +1427,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/experiences?lang=es",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "experiences"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["experiences"],
               "query": [
                 {
                   "key": "lang",
@@ -1734,9 +1442,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1748,12 +1454,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/skills",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "skills"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["skills"]
             }
           },
           "event": [
@@ -1761,9 +1463,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1775,12 +1475,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/project-categories?lang=es",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "project-categories"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["project-categories"],
               "query": [
                 {
                   "key": "lang",
@@ -1794,9 +1490,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1808,12 +1502,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/social-links",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "social-links"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["social-links"]
             }
           },
           "event": [
@@ -1821,9 +1511,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1845,12 +1533,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/contact",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "contact"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"]
             },
             "body": {
               "mode": "raw",
@@ -1867,9 +1551,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 201', () => pm.response.to.have.status(201));"
-                ]
+                "exec": ["pm.test('status 201', () => pm.response.to.have.status(201));"]
               }
             }
           ]
@@ -1886,12 +1568,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/contact",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "contact"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"]
             },
             "body": {
               "mode": "raw",
@@ -1908,9 +1586,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 201', () => pm.response.to.have.status(201));"
-                ]
+                "exec": ["pm.test('status 201', () => pm.response.to.have.status(201));"]
               }
             }
           ]
@@ -1922,13 +1598,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/contact-messages?limit=20&page=1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "contact-messages"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "contact-messages"],
               "query": [
                 {
                   "key": "limit",
@@ -1964,14 +1635,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/contact-messages/{{contactMessageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "contact-messages",
-                "{{contactMessageId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "contact-messages", "{{contactMessageId}}"]
             },
             "description": "Revisar `emailStatus` y `emailError`."
           },
@@ -1980,9 +1645,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -1999,14 +1662,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/contact-messages/{{contactMessageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "contact-messages",
-                "{{contactMessageId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "contact-messages", "{{contactMessageId}}"]
             },
             "body": {
               "mode": "raw",
@@ -2023,9 +1680,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -2037,14 +1692,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/admin/contact-messages/{{contactMessageId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "contact-messages",
-                "{{contactMessageId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "contact-messages", "{{contactMessageId}}"]
             }
           },
           "event": [
@@ -2052,9 +1701,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -2072,13 +1719,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "logout"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
             }
           },
           "event": [
@@ -2086,9 +1728,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 200', () => pm.response.to.have.status(200));"
-                ]
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
               }
             }
           ]
@@ -2100,13 +1740,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "me"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
             }
           },
           "event": [
@@ -2114,9 +1749,7 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 401', () => pm.response.to.have.status(401));"
-                ]
+                "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
               }
             }
           ]
