@@ -16,6 +16,8 @@ const cloudinaryKeys = [
   'CLOUDINARY_API_SECRET',
 ] as const;
 
+const resendKeys = ['RESEND_API_KEY', 'CONTACT_TO_EMAIL', 'CONTACT_FROM_EMAIL'] as const;
+
 // An empty value in .env ("CLOUDINARY_API_KEY=") counts as unset.
 const optionalString = z.preprocess(
   (v) => (v === '' ? undefined : v),
@@ -35,11 +37,16 @@ export const envSchema = z
     CLOUDINARY_CLOUD_NAME: optionalString,
     CLOUDINARY_API_KEY: optionalString,
     CLOUDINARY_API_SECRET: optionalString,
+    RESEND_API_KEY: optionalString,
+    // Where visitor messages are delivered; the sender must be a Resend-verified address.
+    CONTACT_TO_EMAIL: z.preprocess((v) => (v === '' ? undefined : v), z.email().optional()),
+    CONTACT_FROM_EMAIL: optionalString,
   })
-  // Locally the API boots without Cloudinary (uploads answer 503); production must not.
+  // Locally the API boots without Cloudinary or Resend (uploads answer 503, contact messages are
+  // saved but not emailed); production must not.
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;
-    for (const key of cloudinaryKeys) {
+    for (const key of [...cloudinaryKeys, ...resendKeys]) {
       if (!env[key])
         ctx.addIssue({ code: 'custom', path: [key], message: 'required in production' });
     }

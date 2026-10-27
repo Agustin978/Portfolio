@@ -39,6 +39,7 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 **Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet.
 
 **Autenticación** (Fase 2, hecho): `server/src/modules/auth/`. `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`; `requireAuth` protege las rutas del panel (se importa de `auth.middleware.ts` y se cablea en `app.ts`).
+
 - JWT HS256 con solo `sub` (más `iat`/`exp`), en cookie `session`. Duración: `JWT_EXPIRES_IN_SECONDS` (8 h por defecto), usada para el `exp` y el `maxAge`. Sin refresh token.
 - `requireAuth` relee al admin por id en cada request y rechaza el token si el admin no existe o si `iat` es anterior a `admin_users.updated_at`. Re-correr el seed con otra `ADMIN_PASSWORD` rota la contraseña y cierra las sesiones viejas.
 - Login: mismo error `INVALID_CREDENTIALS` para email inexistente y contraseña errónea, con una verificación argon2 contra un hash falso (mismos parámetros, `shared/security/password.ts`). El email se normaliza (trim y minúsculas) en login y seed. Límites: email 254, contraseña 256.
@@ -66,6 +67,12 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 - Redes sociales: sin borrado físico, se ocultan con `isVisible`.
 - Proyectos y experiencias: el service valida el estado resultante de cada PATCH (publicado exige ambos idiomas: `422 INCOMPLETE_TRANSLATION` con los campos que faltan). El slug de un proyecto queda bloqueado (`409 SLUG_LOCKED`) tras su primera publicación. Editar nunca reactiva algo desactivado. `technologyIds` (omitido = sin cambio, `[]` = vaciar) se aplica en una transacción; las tablas intermedias no tienen `sort_order`.
 - Los mensajes de contacto se guardan primero y el email se envía después (`email_status`).
+- **Contacto** (Fase 5, hecho; `server/src/modules/contact/`, contrato en `docs/api.md`): `POST /contact` público y `/admin/contact-messages` (listar paginado, detalle, `isRead`, DELETE real).
+  - Se guarda la fila `pending` y se envía el correo **dentro del request** con timeout de 5 s (`sendTimeoutMs` inyectable); siempre `201 { received: true }`. El service nunca propaga errores del mailer: la fila queda `failed` con `emailError` = código corto fijo (`not configured`, `timeout` (el correo pudo salir), `daily_cap`, `send_failed[:<código>]`), nunca texto del proveedor. Clave de idempotencia de Resend: `contact-<id>`. Sin reintento de `failed`.
+  - Tope global: con 50 filas `sent` en las últimas 24 h el mensaje se guarda sin enviar (`daily_cap`); el conteo no es atómico, es un freno blando.
+  - Resend solo se toca desde `shared/mail/` (interfaz `Mailer`; doble `tests/helpers/fakeMailer.ts` enchufado con `vi.mock` de `shared/mail/index.js`). `RESEND_API_KEY`, `CONTACT_TO_EMAIL` y `CONTACT_FROM_EMAIL` son obligatorias solo en producción. Remitente inicial `onboarding@resend.dev` hacia el email de la cuenta de Resend; dominio propio en la Fase 9.
+  - Honeypot `hp_check`: se revisa **antes** de validar y devuelve el mismo 201 sin guardar. Rate limit: 5 por hora por IP, contando los exitosos.
+  - **Privacidad**: nunca registrar `name`, `email` ni `message`, solo id y motivo. Un error de Prisma puede traer los valores en su texto, por eso el `create` del repository relanza un error sin ellos.
 - Tests de base: usan `TEST_DATABASE_URL` (el nombre debe terminar en `_test`; los tests vacían las tablas).
 
 ## Convenciones
@@ -100,13 +107,14 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 
 ## Estado actual y próximos pasos
 
-_Última actualización: 2026-10-22._
+_Última actualización: 2026-10-24._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
 - Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
 - Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
-- Fase 4: imágenes hechas en la rama `feature/images` (266 tests pasan), pendiente de PR hacia `dev` y de la prueba manual contra Cloudinary real.
-- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`.
+- Fase 4: imágenes hechas y fusionadas en `dev` (PR #6); la prueba manual contra Cloudinary real salió bien.
+- Fase 5: contacto (API) hecho en la rama `feature/contact`, pendiente de PR hacia `dev`. Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
+- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm install` antes de `npm run dev`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: Fase 5 (contacto: formulario, guardado primero, email con Resend después, rate limit con `createRateLimiter`). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: Fase 6 (sitio público, incluido el formulario de contacto con el honeypot `hp_check` según `docs/api.md`). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.
