@@ -7,7 +7,7 @@ const STATE_CHANGING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 // With a cookie session that is a CSRF hole, so state-changing requests that declare a foreign
 // Origin are refused outright. A missing Origin (curl, server-to-server, same-origin) is allowed.
 export const createOriginGuard = (allowedOrigin: string): RequestHandler => {
-  // CLIENT_ORIGIN may be written with a trailing slash; the Origin header never has one.
+  // env already hands over a bare origin; normalizing again keeps the guard safe on its own.
   const allowed = new URL(allowedOrigin).origin;
 
   return (req, _res, next) => {
