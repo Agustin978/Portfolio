@@ -13,7 +13,7 @@ Sitio público bilingüe (es/en) con proyectos y experiencia laboral, formulario
 
 ## Entorno
 
-Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y `portfolio_test`). Todo debe funcionar en Windows.
+Windows + PowerShell, Node 24.14.0 y npm 11.9 (fijados en `.nvmrc` y `engines`: otra versión de npm reescribe `package-lock.json`), PostgreSQL 17 local (bases `portfolio_dev` y `portfolio_test`). Todo debe funcionar en Windows.
 
 ## Ramas
 
@@ -44,7 +44,7 @@ Windows + PowerShell, Node 24 LTS, PostgreSQL 17 local (bases `portfolio_dev` y 
 - `requireAuth` relee al admin por id en cada request y rechaza el token si el admin no existe o si `iat` es anterior a `admin_users.updated_at`. Re-correr el seed con otra `ADMIN_PASSWORD` rota la contraseña y cierra las sesiones viejas.
 - Login: mismo error `INVALID_CREDENTIALS` para email inexistente y contraseña errónea, con una verificación argon2 contra un hash falso (mismos parámetros, `shared/security/password.ts`). El email se normaliza (trim y minúsculas) en login y seed. Límites: email 254, contraseña 256.
 - Rate limit: 5 intentos fallidos cada 15 min por IP (`skipSuccessfulRequests`), con `createRateLimiter` (reutilizable en contacto). `trust proxy` = 1, nunca `true`.
-- Guardia de origen: POST/PUT/PATCH/DELETE con `Origin` distinto de `CLIENT_ORIGIN` responden 403 `FORBIDDEN_ORIGIN`; sin `Origin` se permite. `Cache-Control: no-store` en `/auth/*`. No registrar body ni cookies.
+- Guardia de origen: POST/PUT/PATCH/DELETE con `Origin` distinto de `CLIENT_ORIGIN` responden 403 `FORBIDDEN_ORIGIN`; sin `Origin` se permite. `CLIENT_ORIGIN` se reduce a su origen en `config/env.ts` (sin barra final ni ruta, solo http(s)) y CORS y la guardia usan ese mismo valor. `Cache-Control: no-store` en `/auth/*`. No registrar body ni cookies.
 - **Riesgo para la Fase 9**: con el cliente (Cloudflare Pages) y la API (Render) en dominios distintos, la cookie debe ser `SameSite=None; Secure`, y Safari bloquea las cookies entre sitios. Hoy es `SameSite=Lax` (`auth.cookie.ts`). La decisión (dominio propio bajo el mismo sitio, proxy, etc.) se toma en esa fase.
 
 **Datos** (Fase 1, hecho): esquema en `server/prisma/schema.prisma`, 13 tablas — admin_users, profile, project_categories, projects, experiences, technologies, project_technologies, experience_technologies, images, project_images, experience_images, social_links, contact_messages. Todo texto visible lleva columnas `_es` y `_en` (nombres de tecnologías y empresas: una sola columna). Publicar exige ambos idiomas completos y no vacíos (CHECK en la base). Los CHECK, el singleton de `profile` y el índice parcial de portada están escritos a mano al final de la migración init: Prisma no los modela, así que revisar siempre el SQL de cada migración nueva (la prueba de la Fase 1 confirmó que Prisma no los elimina).
