@@ -4,7 +4,13 @@ Portfolio personal bilingüe (es/en) con panel de administración. Monorepo con 
 
 ## Requisitos (Windows)
 
-- Node 24.14.0 y npm 11.9 (la versión exacta está en `.nvmrc` y en `engines` de `package.json`; usar otra puede reescribir `package-lock.json`). Con nvm-windows: `nvm install 24.14.0` y `nvm use 24.14.0`
+- Node 24.22.1 con el npm que trae (11.19.1). La versión exacta está en `.nvmrc`; `engines` de `package.json` fija los mínimos. No instales npm global aparte: otra versión de npm puede reescribir `package-lock.json`.
+- [fnm](https://github.com/Schniz/fnm) para gestionar Node (`winget install Schniz.fnm`). Agregá esta línea al perfil de PowerShell (`notepad $PROFILE`) para que tome el `.nvmrc` al entrar a la carpeta:
+
+  ```powershell
+  fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+  ```
+
 - Git
 - PostgreSQL 17 local con dos bases vacías: `portfolio_dev` y `portfolio_test`
 
@@ -13,9 +19,14 @@ Portfolio personal bilingüe (es/en) con panel de administración. Monorepo con 
 ```powershell
 git clone https://github.com/Agustin978/Portfolio.git
 cd Portfolio
-npm install
+fnm install        # instala la versión de .nvmrc
+node -v            # v24.22.1
+npm -v             # 11.19.1
+npm ci
 Copy-Item .env.example .env
 ```
+
+`npm ci` instala exactamente lo que dice `package-lock.json` sin modificarlo; usalo también al cambiar de rama. `npm install` solo para agregar o quitar dependencias. npm avisa que saltea los scripts de instalación de `@prisma/engines`, `argon2`, `esbuild` y `prisma`: es esperado, el proyecto funciona sin ellos y no hace falta aprobarlos.
 
 Editá `.env` (queda fuera de git; `.env.example` solo trae los nombres). Si falta o es inválida una variable obligatoria, el servidor se detiene al arrancar y escribe `Invalid environment variables:` con el nombre de cada una.
 
@@ -50,13 +61,15 @@ npm run dev
 
 ## Comandos
 
-| Comando          | Qué hace                       |
-| ---------------- | ------------------------------ |
-| `npm run dev`    | Cliente y servidor juntos      |
-| `npm run lint`   | ESLint                         |
-| `npm run format` | Prettier (escribe los cambios) |
-| `npm test`       | Tests (Vitest + supertest)     |
-| `npm run build`  | Build de cliente y servidor    |
+| Comando                | Qué hace                       |
+| ---------------------- | ------------------------------ |
+| `npm ci`               | Instala desde el lockfile      |
+| `npm run dev`          | Cliente y servidor juntos      |
+| `npm run lint`         | ESLint                         |
+| `npm run format`       | Prettier (escribe los cambios) |
+| `npm run format:check` | Prettier (solo verifica)       |
+| `npm test`             | Tests (Vitest + supertest)     |
+| `npm run build`        | Build de cliente y servidor    |
 
 ## Flujo de trabajo
 
