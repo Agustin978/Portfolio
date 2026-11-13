@@ -17,6 +17,36 @@ const cloudinary = {
   CLOUDINARY_API_SECRET: 'secret',
 };
 
+describe('CLIENT_ORIGIN', () => {
+  const parse = (CLIENT_ORIGIN: string) => envSchema.safeParse({ ...base, CLIENT_ORIGIN });
+
+  it('is reduced to its origin, without a trailing slash or path', () => {
+    expect(parse('http://localhost:5173').data?.CLIENT_ORIGIN).toBe('http://localhost:5173');
+    expect(parse('http://localhost:5173/').data?.CLIENT_ORIGIN).toBe('http://localhost:5173');
+    expect(parse('https://app.example.com/portfolio/?x=1').data?.CLIENT_ORIGIN).toBe(
+      'https://app.example.com',
+    );
+  });
+
+  it('lowercases the host so it matches what the browser sends', () => {
+    expect(parse('https://App.Example.com/').data?.CLIENT_ORIGIN).toBe('https://app.example.com');
+  });
+
+  // These URLs parse but have the opaque origin "null", which would let `Origin: null`
+  // (sandboxed iframes, local files) through CORS and the origin guard.
+  it.each(['file:///etc/hosts', 'data:text/plain,hi', 'javascript:alert(1)', 'ftp://example.com'])(
+    'rejects %s because it is not an http(s) URL',
+    (value) => {
+      expect(parse(value).success).toBe(false);
+    },
+  );
+
+  it('rejects text that is not a URL', () => {
+    expect(parse('localhost:5173').success).toBe(false);
+    expect(parse('').success).toBe(false);
+  });
+});
+
 describe('Cloudinary variables', () => {
   it('are optional outside production', () => {
     expect(envSchema.safeParse({ ...base, NODE_ENV: 'development' }).success).toBe(true);

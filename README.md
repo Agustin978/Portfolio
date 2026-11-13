@@ -4,7 +4,13 @@ Portfolio personal bilingüe (es/en) con panel de administración. Monorepo con 
 
 ## Requisitos (Windows)
 
-- Node 24 LTS y npm
+- Node 24.22.1 con el npm que trae (11.19.1). La versión exacta está en `.nvmrc`; `engines` de `package.json` fija los mínimos. No instales npm global aparte: otra versión de npm puede reescribir `package-lock.json`.
+- [fnm](https://github.com/Schniz/fnm) para gestionar Node (`winget install Schniz.fnm`). Agregá esta línea al perfil de PowerShell (`notepad $PROFILE`) para que tome el `.nvmrc` al entrar a la carpeta:
+
+  ```powershell
+  fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+  ```
+
 - Git
 - PostgreSQL 17 local con dos bases vacías: `portfolio_dev` y `portfolio_test`
 
@@ -13,34 +19,38 @@ Portfolio personal bilingüe (es/en) con panel de administración. Monorepo con 
 ```powershell
 git clone https://github.com/Agustin978/Portfolio.git
 cd Portfolio
-npm install
+fnm install        # instala la versión de .nvmrc
+node -v            # v24.22.1
+npm -v             # 11.19.1
+npm ci
 Copy-Item .env.example .env
 ```
 
-Editá `.env` y completá al menos:
+`npm ci` instala exactamente lo que dice `package-lock.json` sin modificarlo; usalo también al cambiar de rama. `npm install` solo para agregar o quitar dependencias. npm avisa que saltea los scripts de instalación de `@prisma/engines`, `argon2`, `esbuild` y `prisma`: es esperado, el proyecto funciona sin ellos y no hace falta aprobarlos.
 
-```
-PORT=4000
-CLIENT_ORIGIN=http://localhost:5173
-```
+Editá `.env` (queda fuera de git; `.env.example` solo trae los nombres). Si falta o es inválida una variable obligatoria, el servidor se detiene al arrancar y escribe `Invalid environment variables:` con el nombre de cada una.
 
-Para la base de datos (Fase 1):
+| Variable                                                               | Cuándo hace falta                               | Detalle                                                                                                                                              |
+| ---------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLIENT_ORIGIN`                                                        | Siempre                                         | Origen del cliente, por ejemplo `http://localhost:5173`. Solo http(s); la barra final y la ruta se descartan                                         |
+| `DATABASE_URL`                                                         | Siempre                                         | `postgresql://USUARIO:CLAVE@localhost:5432/portfolio_dev`                                                                                            |
+| `JWT_SECRET`                                                           | Siempre                                         | 32 caracteres o más; sin ella el servidor aborta. Para generar una: `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                        | Para `npm run db:seed`                          | La contraseña, de 12 caracteres o más. La API en marcha no las lee; volver a correr el seed con otra contraseña la rota                              |
+| `TEST_DATABASE_URL`                                                    | Para `npm test`                                 | `postgresql://USUARIO:CLAVE@localhost:5432/portfolio_test`. El nombre debe terminar en `_test` porque los tests vacían las tablas                    |
+| `PORT`                                                                 | Opcional                                        | 4000 por defecto                                                                                                                                     |
+| `JWT_EXPIRES_IN_SECONDS`                                               | Opcional                                        | 28800 (8 horas) por defecto                                                                                                                          |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Obligatorias en producción, opcionales en local | Sin ellas, subir una imagen responde 503 `STORAGE_NOT_CONFIGURED`                                                                                    |
+| `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`             | Obligatorias en producción, opcionales en local | Sin ellas, los mensajes de contacto se guardan pero el envío queda como `failed: not configured`                                                     |
 
-```
-DATABASE_URL=postgresql://USUARIO:CLAVE@localhost:5432/portfolio_dev
-TEST_DATABASE_URL=postgresql://USUARIO:CLAVE@localhost:5432/portfolio_test
-ADMIN_EMAIL=tu-email
-ADMIN_PASSWORD=al-menos-12-caracteres
-```
-
-El resto de las variables se usan en fases posteriores. Después aplicá el esquema y cargá el admin:
+Después generá el cliente de Prisma (Prisma 7 no lo hace solo y `src/generated` no está en git), aplicá el esquema y cargá el admin:
 
 ```powershell
+npm run db:generate -w server
 npm run db:migrate -w server
 npm run db:seed -w server
 ```
 
-`npm test` necesita `TEST_DATABASE_URL`: el nombre de la base debe terminar en `_test` porque los tests la vacían. Las migraciones se aplican solas antes de correr.
+`npm test` necesita `TEST_DATABASE_URL`. Las migraciones se aplican solas antes de correr.
 
 ```powershell
 npm run dev
@@ -51,13 +61,15 @@ npm run dev
 
 ## Comandos
 
-| Comando          | Qué hace                       |
-| ---------------- | ------------------------------ |
-| `npm run dev`    | Cliente y servidor juntos      |
-| `npm run lint`   | ESLint                         |
-| `npm run format` | Prettier (escribe los cambios) |
-| `npm test`       | Tests (Vitest + supertest)     |
-| `npm run build`  | Build de cliente y servidor    |
+| Comando                | Qué hace                       |
+| ---------------------- | ------------------------------ |
+| `npm ci`               | Instala desde el lockfile      |
+| `npm run dev`          | Cliente y servidor juntos      |
+| `npm run lint`         | ESLint                         |
+| `npm run format`       | Prettier (escribe los cambios) |
+| `npm run format:check` | Prettier (solo verifica)       |
+| `npm test`             | Tests (Vitest + supertest)     |
+| `npm run build`        | Build de cliente y servidor    |
 
 ## Flujo de trabajo
 

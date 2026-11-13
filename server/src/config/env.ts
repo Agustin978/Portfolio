@@ -28,7 +28,10 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4000),
-    CLIENT_ORIGIN: z.url(),
+    // Reduced to its origin here so CORS (plain-text match in the browser) and the origin guard
+    // see the same value; "https://app.example.com/" would otherwise block every cross-site call.
+    // Other schemes parse but have the opaque origin "null", so they are refused.
+    CLIENT_ORIGIN: z.url({ protocol: /^https?$/ }).transform((value) => new URL(value).origin),
     DATABASE_URL: z.string().min(1),
     // HS256 key: short secrets are brute-forceable offline from a single captured token.
     JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Portfolio – Escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAFAF9;color:#18181B;font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:2px solid #18181B;outline-offset:3px}
+.nav-link:hover{color:#18181B;border-bottom-color:#18181B}
+.btn-primary:hover{background:#3F3F46}
+.btn-secondary:hover{background:#F4F4F5}
+.btn-light:hover{background:#E4E4E7}
+.btn-ghost:hover{background:#27272A}
+.chip:hover{border-color:#A1A1AA}
+.card{transition:border-color .15s ease}
+.card:hover{border-color:#A1A1AA}
+</style>
+</helmet>
+<div id="inicio" style="width: 100%; background: #FAFAF9; color: #18181B; font-family: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+  <header style="width: 100%; max-width: 1040px; margin: 0 auto; padding: 16px clamp(20px, 5vw, 48px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+    <a href="#inicio" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; text-decoration: none">
+      <span style="width: 10px; height: 10px; border-radius: 50%; background: {{accent}}"></span>
+      Agustín
+    </a>
+    <nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 0 28px">
+      <a class="nav-link" href="#proyectos" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: #52525B; text-decoration: none; border-bottom: 1px solid transparent">Proyectos</a>
+      <a class="nav-link" href="#sobre-mi" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: #52525B; text-decoration: none; border-bottom: 1px solid transparent">Sobre mí</a>
+      <a class="nav-link" href="#contacto" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: #52525B; text-decoration: none; border-bottom: 1px solid transparent">Contacto</a>
+    </nav>
+  </header>
+
+  <main style="width: 100%">
+
+    <section aria-labelledby="hero-titulo" style="width: 100%; max-width: 1040px; margin: 0 auto; padding: clamp(56px, 10vw, 120px) clamp(20px, 5vw, 48px); display: flex; flex-direction: column; align-items: flex-start; gap: 24px">
+      <p style="margin: 0; display: inline-flex; align-items: center; gap: 10px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #52525B">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: {{accent}}"></span>
+        Desarrollador · San Miguel de Tucumán
+      </p>
+      <h1 id="hero-titulo" style="margin: 0; max-width: 16em; font-size: clamp(36px, 7vw, 72px); font-weight: 600; line-height: 1.05; letter-spacing: -0.035em; text-wrap: balance">Desarrollo sistemas web que se usan todos los días.</h1>
+      <p style="margin: 0; max-width: 56ch; font-size: clamp(17px, 2vw, 20px); line-height: 1.55; color: #52525B; text-wrap: pretty">Soy Agustín, ingeniero en informática. Trabajo con Laravel, Livewire y PostgreSQL, y vengo del mundo de las redes y la infraestructura.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px">
+        <a class="btn-primary" href="#proyectos" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; border-radius: 999px; background: #18181B; color: #FAFAF9; font-size: 16px; font-weight: 500; text-decoration: none">
+          Ver proyectos
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 9l4 4 4-4"></path></svg>
+        </a>
+        <a class="btn-secondary" href="#contacto" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid #D4D4D8; color: #18181B; font-size: 16px; font-weight: 500; text-decoration: none">Contacto</a>
+      </div>
+    </section>
+
+    <section id="proyectos" aria-labelledby="proyectos-titulo" style="width: 100%; border-top: 1px solid #E4E4E7">
+      <div style="width: 100%; max-width: 1040px; margin: 0 auto; padding: clamp(48px, 8vw, 80px) clamp(20px, 5vw, 48px); display: flex; flex-direction: column; gap: 32px">
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px">
+          <h2 id="proyectos-titulo" style="margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1">Proyectos</h2>
+          <div role="group" aria-label="Filtrar proyectos por categoría" style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{chips}}" as="chip" hint-placeholder-count="4">
+              <button class="chip" type="button" onClick="{{chip.pick}}" aria-pressed="{{chip.pressed}}" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid {{chip.border}}; background: {{chip.bg}}; color: {{chip.fg}}; font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer">{{chip.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px">
+          <sc-for list="{{projects}}" as="p" hint-placeholder-count="4">
+            <article class="card" style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 16px; overflow: hidden">
+              <div style="width: 100%; aspect-ratio: 16 / 9; background: #F4F4F5; border-bottom: 1px solid #E4E4E7; display: flex; align-items: center; justify-content: center">
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #52525B">[Captura del proyecto]</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px; padding: 24px; flex-grow: 1">
+                <p style="margin: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: {{accent}}">{{p.category}}</p>
+                <h3 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2">{{p.title}}</h3>
+                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #52525B; text-wrap: pretty">{{p.desc}}</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px">
+                  <sc-for list="{{p.stack}}" as="s" hint-placeholder-count="3">
+                    <span style="padding: 4px 8px; border-radius: 6px; background: #F4F4F5; color: #3F3F46; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">{{s.t}}</span>
+                  </sc-for>
+                </div>
+                <div style="margin-top: auto; padding-top: 8px">
+                  <a href="#proyectos" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: {{accent}}; font-size: 15px; font-weight: 500; text-decoration: none">
+                    Ver detalle
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"></path></svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre-mi" aria-labelledby="sobre-titulo" style="width: 100%; border-top: 1px solid #E4E4E7">
+      <div style="width: 100%; max-width: 1040px; margin: 0 auto; padding: clamp(48px, 8vw, 80px) clamp(20px, 5vw, 48px); display: flex; flex-wrap: wrap; gap: 32px 48px">
+        <h2 id="sobre-titulo" style="margin: 0; flex: 1 1 200px; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1">Sobre mí</h2>
+        <div style="flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 40px">
+          <div style="display: flex; flex-direction: column; gap: 16px; max-width: 60ch">
+            <p style="margin: 0; font-size: 18px; line-height: 1.6; text-wrap: pretty">Soy ingeniero en informática por la Universidad Nacional de Tucumán. Trabajo como desarrollador, analista y arquitecto de bases de datos en el Ministerio de Desarrollo Social de Tucumán.</p>
+            <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #52525B; text-wrap: pretty">Antes de enfocarme en el desarrollo me formé en redes y administración de Windows Server, y después hice el bootcamp Full Stack (MERN) en Rolling Code School.</p>
+          </div>
+          <div style="display: flex; flex-direction: column">
+            <div style="display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; border-top: 1px solid #E4E4E7">
+              <p style="margin: 0; flex: 0 0 140px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #52525B">Desarrollo</p>
+              <p style="margin: 0; flex: 1 1 240px; font-size: 16px; line-height: 1.7">Laravel · Livewire · Alpine.js · Tailwind CSS · Flux UI · Node.js · TypeScript</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; border-top: 1px solid #E4E4E7">
+              <p style="margin: 0; flex: 0 0 140px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #52525B">Datos</p>
+              <p style="margin: 0; flex: 1 1 240px; font-size: 16px; line-height: 1.7">PostgreSQL · Diseño de bases de datos</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; border-top: 1px solid #E4E4E7; border-bottom: 1px solid #E4E4E7">
+              <p style="margin: 0; flex: 0 0 140px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #52525B">Infraestructura</p>
+              <p style="margin: 0; flex: 1 1 240px; font-size: 16px; line-height: 1.7">Redes · Windows Server · GitLab CI/CD</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" aria-labelledby="contacto-titulo" style="width: 100%">
+      <div style="width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px) clamp(48px, 8vw, 80px)">
+        <div style="background: #18181B; color: #FAFAF9; border-radius: 24px; padding: clamp(32px, 6vw, 64px); display: flex; flex-direction: column; align-items: flex-start; gap: 20px">
+          <h2 id="contacto-titulo" style="margin: 0; max-width: 14em; font-size: clamp(28px, 5vw, 48px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance">Trabajemos juntos.</h2>
+          <p style="margin: 0; max-width: 52ch; font-size: 17px; line-height: 1.6; color: #D4D4D8; text-wrap: pretty">Estoy abierto a oportunidades de desarrollo backend, full stack e infraestructura.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 12px">
+            <a class="btn-light" href="mailto:[tu@email.com]" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: #FAFAF9; color: #18181B; font-size: 16px; font-weight: 500; text-decoration: none">[tu@email.com]</a>
+            <a class="btn-ghost" href="#contacto" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid #52525B; color: #FAFAF9; font-size: 16px; font-weight: 500; text-decoration: none">GitHub</a>
+            <a class="btn-ghost" href="#contacto" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid #52525B; color: #FAFAF9; font-size: 16px; font-weight: 500; text-decoration: none">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="width: 100%; max-width: 1040px; margin: 0 auto; padding: 24px clamp(20px, 5vw, 48px) 40px; border-top: 1px solid #E4E4E7; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+    <p style="margin: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #52525B">© 2026 Agustín · San Miguel de Tucumán, Argentina</p>
+    <a href="#inicio" style="display: inline-flex; align-items: center; min-height: 44px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #52525B; text-decoration: none">Volver arriba ↑</a>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F766E","options":["#0F766E","#1D4ED8","#B45309","#9F1239"]},"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#0F766E';
+    const filter = this.state.filter;
+    const all = [
+      {
+        cat: 'web', category: 'Web',
+        title: 'RUCVM',
+        desc: 'Sistema de gestión de casos del Ministerio de Desarrollo Social de Tucumán: fichas sociales, seguimiento de intervenciones y reportes estadísticos.',
+        stack: ['Laravel', 'Livewire', 'Flux UI', 'Tailwind', 'PostgreSQL', 'GitLab CI/CD']
+      },
+      {
+        cat: 'web', category: 'Web',
+        title: 'Sistema comercial SaaS',
+        desc: 'Sistema comercial con arquitectura modular, desarrollado por fases. Proyecto personal en construcción.',
+        stack: ['Laravel 12', 'Livewire', 'Alpine.js', 'Tailwind', 'Flux UI']
+      },
+      {
+        cat: 'ia', category: 'IA',
+        title: 'Clasificación de radiografías de tórax',
+        desc: 'Proyecto final de la carrera: modelo híbrido de Deep Learning para clasificar 14 patologías en radiografías, priorizando la sensibilidad clínica.',
+        stack: ['Deep Learning', 'DenseNet-121', 'NIH Chest X-ray']
+      },
+      {
+        cat: 'redes', category: 'Redes',
+        title: 'Laboratorios de redes',
+        desc: 'Topologías armadas en Cisco Packet Tracer: VLANs, enrutamiento entre sedes y control de acceso.',
+        stack: ['Cisco Packet Tracer', 'VLAN', 'Routing']
+      }
+    ];
+    const cats = [
+      { id: 'all', label: 'Todos' },
+      { id: 'web', label: 'Web' },
+      { id: 'ia', label: 'IA' },
+      { id: 'redes', label: 'Redes' }
+    ];
+    return {
+      accent,
+      chips: cats.map((c) => {
+        const on = filter === c.id;
+        return {
+          label: c.label,
+          pressed: on ? 'true' : 'false',
+          bg: on ? '#18181B' : '#FFFFFF',
+          fg: on ? '#FAFAF9' : '#18181B',
+          border: on ? '#18181B' : '#D4D4D8',
+          pick: () => this.setState({ filter: c.id })
+        };
+      }),
+      projects: all
+        .filter((p) => filter === 'all' || p.cat === filter)
+        .map((p) => ({ ...p, stack: p.stack.map((t) => ({ t })) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
