@@ -13,7 +13,12 @@ Sitio público bilingüe (es/en) con proyectos y experiencia laboral, formulario
 
 ## Entorno
 
-Windows + PowerShell, Node 24.14.0 y npm 11.9 (fijados en `.nvmrc` y `engines`: otra versión de npm reescribe `package-lock.json`), PostgreSQL 17 local (bases `portfolio_dev` y `portfolio_test`). Todo debe funcionar en Windows.
+Windows + PowerShell, Node 24.22.1 con el npm que trae (11.19.1), PostgreSQL 17 local (bases `portfolio_dev` y `portfolio_test`). Todo debe funcionar en Windows.
+
+- La versión se fija por Node: `.nvmrc` exacto, `engines.node` `>=24.22.1 <25` y `engines.npm` `>=11.19.1` como mínimo, sin `engine-strict`. Cada Node trae su npm; npm no se actualiza aparte ni se instala global.
+- Node se gestiona con `fnm` en todas las computadoras (`fnm env --use-on-cd` en el perfil de PowerShell toma el `.nvmrc`).
+- Primera instalación y cambio de rama: `npm ci` (no toca el lockfile). `npm install` solo para agregar o quitar dependencias. Si hay que regenerar `package-lock.json`, va en un commit aparte con la versión fijada. Mientras una computadora no coincida con el pin, no se commitea desde ella.
+- npm 11.19.1 saltea los scripts de instalación no aprobados (`@prisma/engines`, `argon2`, `esbuild`, `prisma`). Hoy no hacen falta: lint, tests, build y Prisma funcionan sin ellos. No aprobarlos sin consultar.
 
 ## Ramas
 
@@ -36,7 +41,7 @@ Windows + PowerShell, Node 24.14.0 y npm 11.9 (fijados en `.nvmrc` y `engines`: 
 
 **Cliente**: componentes presentacionales que no hacen fetch; los datos llegan por hooks con TanStack Query y una capa `services/` con `apiClient`. Mobile-first. El idioma va en la URL (`/es`, `/en`); los textos de interfaz viven en `src/i18n/es.json` y `en.json`.
 
-**Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet.
+**Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet. En el cliente, todo lo que viene de la API se renderiza como texto: nunca `dangerouslySetInnerHTML`.
 
 **Autenticación** (Fase 2, hecho): `server/src/modules/auth/`. `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`; `requireAuth` protege las rutas del panel (se importa de `auth.middleware.ts` y se cablea en `app.ts`).
 
@@ -88,7 +93,7 @@ Si existe `docs/design/`, leerlo primero. Tokens en `client/src/styles/tokens.cs
 ## Comandos
 
 ```powershell
-npm install        # instala ambos workspaces
+npm ci             # instala ambos workspaces sin tocar el lockfile
 npm run dev        # cliente (5173) y servidor (4000) juntos
 npm run lint       # ESLint
 npm run format     # Prettier (escribe)
@@ -107,14 +112,15 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 
 ## Estado actual y próximos pasos
 
-_Última actualización: 2026-10-24._
+_Última actualización: 2026-11-13._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
 - Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
 - Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
 - Fase 4: imágenes hechas y fusionadas en `dev` (PR #6); la prueba manual contra Cloudinary real salió bien.
-- Fase 5: contacto (API) hecho en la rama `feature/contact`, pendiente de PR hacia `dev`. Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
-- En una máquina nueva: clonar, `npm install`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm install` antes de `npm run dev`.
+- Fase 5: contacto (API) hecho y fusionado en `dev` (PR #7). Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
+- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo).
+- En una máquina nueva: clonar, `fnm install` (lee `.nvmrc`), `npm ci`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm ci` antes de `npm run dev`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: Fase 6 (sitio público, incluido el formulario de contacto con el honeypot `hp_check` según `docs/api.md`). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: PR 2 de la Fase 6 (`feature/dev-demo-content`, script `db:seed-demo`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.
