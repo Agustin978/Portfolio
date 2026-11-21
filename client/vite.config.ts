@@ -14,8 +14,12 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['tests/**/*.test.{ts,tsx}'],
     setupFiles: ['tests/setup.ts'],
-    // Fixed here so tests never depend on a developer's client/.env.
-    env: { VITE_API_URL: '' },
+    env: {
+      // Fixed here so tests never depend on a developer's client/.env.
+      VITE_API_URL: '',
+      // West of UTC, like the site's visitors: a date read in local time slips to the day before.
+      TZ: 'America/Argentina/Buenos_Aires',
+    },
     restoreMocks: true,
     unstubGlobals: true,
   },
