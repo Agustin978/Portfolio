@@ -2,5 +2,116 @@
   "home": {
     "title": "Mi portfolio",
     "subtitle": "Sitio en construcción."
+  },
+  "meta": {
+    "title": "Portfolio"
+  },
+  "nav": {
+    "skip": "Saltar al contenido",
+    "label": "Principal",
+    "projects": "Proyectos",
+    "about": "Sobre mí",
+    "experience": "Experiencia",
+    "contact": "Contacto"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "ES",
+    "en": "EN"
+  },
+  "hero": {
+    "projects": "Ver proyectos",
+    "contact": "Contacto",
+    "cv": "Descargar CV"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "filterLabel": "Filtrar proyectos por categoría",
+    "all": "Todos",
+    "detail": "Ver detalle",
+    "detailFor": "Ver detalle: {{title}}",
+    "empty": "Todavía no hay proyectos publicados."
+  },
+  "projectDetail": {
+    "back": "Proyectos",
+    "live": "Ver sitio",
+    "repo": "Ver código",
+    "gallery": "Imágenes del proyecto",
+    "showImage": "Imagen {{n}} de {{total}}",
+    "technologies": "Tecnologías:"
+  },
+  "about": {
+    "title": "Sobre mí"
+  },
+  "skills": {
+    "groups": {
+      "development": "Desarrollo",
+      "data": "Datos",
+      "infrastructure": "Infraestructura",
+      "other": "Otros"
+    }
+  },
+  "experience": {
+    "title": "Experiencia",
+    "present": "Actualidad"
+  },
+  "contact": {
+    "title": "Trabajemos juntos.",
+    "lead": "Estoy abierto a oportunidades de desarrollo backend, full stack e infraestructura."
+  },
+  "social": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "x": "X",
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "gitlab": "GitLab"
+  },
+  "form": {
+    "name": "Nombre",
+    "email": "Email",
+    "message": "Mensaje",
+    "counter": "{{count}}/{{max}}",
+    "submit": "Enviar mensaje",
+    "sending": "Enviando…",
+    "fallback": "Si el problema sigue, escribime a",
+    "errors": {
+      "required": "Este campo es obligatorio.",
+      "nameTooLong": "El nombre puede tener hasta {{max}} caracteres.",
+      "nameInvalid": "El nombre tiene que ir en una sola línea, sin caracteres especiales.",
+      "emailInvalid": "Ingresá un email válido.",
+      "messageTooShort": "El mensaje tiene que tener al menos {{min}} caracteres.",
+      "messageTooLong": "El mensaje puede tener hasta {{max}} caracteres.",
+      "rateLimited": "Se enviaron demasiados mensajes desde esta conexión. Probá de nuevo más tarde."
+    },
+    "success": {
+      "title": "Recibí tu mensaje.",
+      "body": "Gracias por escribir.",
+      "again": "Enviar otro mensaje"
+    }
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "body": "La página que buscás no existe o se movió.",
+    "project": "Este proyecto no existe o ya no está publicado.",
+    "home": "Volver al inicio"
+  },
+  "errors": {
+    "network": "No se pudo conectar con el servidor. Revisá tu conexión.",
+    "timeout": "El servidor tardó demasiado en responder.",
+    "server": "El servidor tuvo un problema. Probá de nuevo en un momento.",
+    "invalid": "Revisá los datos e intentá de nuevo.",
+    "generic": "Algo salió mal. Probá de nuevo más tarde.",
+    "retry": "Reintentar"
+  },
+  "notice": {
+    "slow": "El servidor está iniciando; puede tardar hasta un minuto."
+  },
+  "common": {
+    "loading": "Cargando…",
+    "newTab": "(se abre en otra pestaña)"
+  },
+  "footer": {
+    "top": "Volver arriba"
   }
 }

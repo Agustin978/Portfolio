@@ -2,5 +2,116 @@
   "home": {
     "title": "My portfolio",
     "subtitle": "Site under construction."
+  },
+  "meta": {
+    "title": "Portfolio"
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "label": "Main",
+    "projects": "Projects",
+    "about": "About me",
+    "experience": "Experience",
+    "contact": "Contact"
+  },
+  "language": {
+    "label": "Language",
+    "es": "ES",
+    "en": "EN"
+  },
+  "hero": {
+    "projects": "View projects",
+    "contact": "Contact",
+    "cv": "Download CV"
+  },
+  "projects": {
+    "title": "Projects",
+    "filterLabel": "Filter projects by category",
+    "all": "All",
+    "detail": "View details",
+    "detailFor": "View details: {{title}}",
+    "empty": "No projects published yet."
+  },
+  "projectDetail": {
+    "back": "Projects",
+    "live": "Live site",
+    "repo": "Source code",
+    "gallery": "Project images",
+    "showImage": "Image {{n}} of {{total}}",
+    "technologies": "Technologies:"
+  },
+  "about": {
+    "title": "About me"
+  },
+  "skills": {
+    "groups": {
+      "development": "Development",
+      "data": "Data",
+      "infrastructure": "Infrastructure",
+      "other": "Other"
+    }
+  },
+  "experience": {
+    "title": "Experience",
+    "present": "Present"
+  },
+  "contact": {
+    "title": "Let's work together.",
+    "lead": "I'm open to backend, full stack and infrastructure development opportunities."
+  },
+  "social": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "x": "X",
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "gitlab": "GitLab"
+  },
+  "form": {
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "counter": "{{count}}/{{max}}",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "fallback": "If the problem continues, email me at",
+    "errors": {
+      "required": "This field is required.",
+      "nameTooLong": "The name can be up to {{max}} characters long.",
+      "nameInvalid": "The name must fit on one line, without special characters.",
+      "emailInvalid": "Enter a valid email address.",
+      "messageTooShort": "The message must be at least {{min}} characters long.",
+      "messageTooLong": "The message can be up to {{max}} characters long.",
+      "rateLimited": "Too many messages were sent from this connection. Please try again later."
+    },
+    "success": {
+      "title": "I got your message.",
+      "body": "Thanks for reaching out.",
+      "again": "Send another message"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "project": "This project doesn't exist or is no longer published.",
+    "home": "Back to home"
+  },
+  "errors": {
+    "network": "Couldn't reach the server. Check your connection.",
+    "timeout": "The server took too long to respond.",
+    "server": "The server ran into a problem. Please try again in a moment.",
+    "invalid": "Please check the information and try again.",
+    "generic": "Something went wrong. Please try again later.",
+    "retry": "Retry"
+  },
+  "notice": {
+    "slow": "The server is starting up; this may take up to a minute."
+  },
+  "common": {
+    "loading": "Loading…",
+    "newTab": "(opens in a new tab)"
+  },
+  "footer": {
+    "top": "Back to top"
   }
 }
