@@ -8,7 +8,7 @@ import {
   demoTechnologies,
 } from '../prisma/demo/content.js';
 import { assertDemoTarget } from '../prisma/demo/guard.js';
-import { experienceBody, projectBody, runSeedDemo } from '../prisma/demo/run.js';
+import { experienceBody, imagesLabel, projectBody, runSeedDemo } from '../prisma/demo/run.js';
 import { createCategoryBody } from '../src/modules/categories/categories.schemas.js';
 import { createExperienceBody } from '../src/modules/experiences/experiences.schemas.js';
 import { updateProfileBody } from '../src/modules/profile/profile.schemas.js';
@@ -50,6 +50,12 @@ describe('assertDemoTarget', () => {
   );
 });
 
+describe('imagesLabel', () => {
+  it('uses the singular only for one image', () => {
+    expect(imagesLabel(1)).toBe('1 imagen');
+    expect(imagesLabel(3)).toBe('3 imágenes');
+  });
+});
 describe('demo content integrity', () => {
   const technologySlugs = new Set(demoTechnologies.map((t) => t.slug));
   const categorySlugs = new Set(demoCategories.map((c) => c.slug));

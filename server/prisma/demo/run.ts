@@ -59,6 +59,8 @@ const placeholderImage = (color: string) =>
 
 const describeError = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+export const imagesLabel = (count: number) => `${count} ${count === 1 ? 'imagen' : 'imágenes'}`;
+
 // Request bodies as the admin API would receive them; exported so the content test parses the
 // exact same objects.
 export const projectBody = (project: DemoProject, categoryId: number, technologyIds: number[]) => ({
@@ -205,7 +207,7 @@ export async function runSeedDemo({
     }
     if (await publishWithImages(project, created.id)) {
       report.created.push(
-        `proyecto ${project.slug} (publicado, ${project.images.length} imágenes)`,
+        `proyecto ${project.slug} (publicado, ${imagesLabel(project.images.length)})`,
       );
     }
   }
@@ -213,7 +215,7 @@ export async function runSeedDemo({
   async function recoverProject(project: DemoProject, id: number) {
     if (await publishWithImages(project, id)) {
       report.created.push(
-        `proyecto ${project.slug} (recuperado: era borrador sin imágenes; publicado, ${project.images.length} imágenes)`,
+        `proyecto ${project.slug} (recuperado: era borrador sin imágenes; publicado, ${imagesLabel(project.images.length)})`,
       );
     }
   }
