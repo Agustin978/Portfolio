@@ -55,20 +55,20 @@ export const demoProfile = {
   fullName: 'Agustín',
   location: 'San Miguel de Tucumán, Argentina',
   publicEmail: 'demo@example.com',
-  roleEs: 'Desarrollador',
-  roleEn: 'Developer',
+  roleEs: 'Desarrollador Full Stack',
+  roleEn: 'Full Stack Developer',
   headlineEs: 'Desarrollo sistemas web que se usan todos los días.',
   headlineEn: 'I build web systems people use every day.',
   introEs:
-    'Soy Agustín, ingeniero en informática. Trabajo con Laravel, Livewire y PostgreSQL, y vengo del mundo de las redes y la infraestructura.',
+    'Soy Agustín, ingeniero en informática. Trabajo con Laravel, Livewire y PostgreSQL, y tengo experiencia en redes e infraestructura.',
   introEn:
-    "I'm Agustín, a computer engineer. I work with Laravel, Livewire and PostgreSQL, and I come from a networking and infrastructure background.",
+    "I'm Agustín, a computer engineer. I work with Laravel, Livewire and PostgreSQL, and I have experience in networking and infrastructure.",
   bioEs:
     'Soy ingeniero en informática por la Universidad Nacional de Tucumán. Trabajo como desarrollador, analista y arquitecto de bases de datos en el Ministerio de Desarrollo Social de Tucumán.\n\n' +
-    'Antes de enfocarme en el desarrollo me formé en redes y administración de Windows Server, y después hice el bootcamp Full Stack (MERN) en Rolling Code School.',
+    'Además del desarrollo, tengo experiencia en infraestructura de redes y administración de Windows Server. Me formé en el bootcamp Full Stack (MERN) de Rolling Code School.',
   bioEn:
     "I'm a computer engineer from the Universidad Nacional de Tucumán. I work as a developer, analyst and database architect at the Ministry of Social Development of Tucumán.\n\n" +
-    'Before focusing on development I trained in networking and Windows Server administration, and later completed the Full Stack (MERN) bootcamp at Rolling Code School.',
+    'Besides development, I have experience in network infrastructure and Windows Server administration. I trained in the Full Stack (MERN) bootcamp at Rolling Code School.',
   availabilityEs:
     'Estoy abierto a oportunidades de desarrollo backend, full stack e infraestructura.',
   availabilityEn: "I'm open to backend, full stack and infrastructure roles.",
@@ -231,13 +231,13 @@ export const demoProjects: DemoProject[] = [
     titleEs: 'Clasificación de radiografías de tórax',
     titleEn: 'Chest X-ray classification',
     summaryEs:
-      'Proyecto final de la carrera: modelo híbrido de Deep Learning para clasificar 14 patologías en radiografías, priorizando la sensibilidad clínica.',
+      'Proyecto final de la carrera: modelo híbrido de Deep Learning para clasificar 14 patologías en radiografías con validación anti-leakage propia, priorizando la sensibilidad clínica.',
     summaryEn:
-      'Final degree project: a hybrid Deep Learning model that classifies 14 pathologies in X-rays, prioritizing clinical sensitivity.',
+      'Final degree project: a hybrid Deep Learning model that classifies 14 pathologies in X-rays with its own anti-leakage validation, prioritizing clinical sensitivity.',
     descriptionEs:
-      'Modelo basado en DenseNet-121 entrenado con el conjunto NIH Chest X-ray. El objetivo fue reducir los falsos negativos, que en un contexto clínico son el error más costoso.',
+      'Modelo basado en DenseNet-121 entrenado con el conjunto NIH Chest X-ray, con validación anti-leakage propia. El objetivo fue reducir los falsos negativos, que en un contexto clínico son el error más costoso.',
     descriptionEn:
-      'A DenseNet-121 based model trained on the NIH Chest X-ray dataset. The goal was to reduce false negatives, the costliest error in a clinical setting.',
+      'A DenseNet-121 based model trained on the NIH Chest X-ray dataset, with its own anti-leakage validation. The goal was to reduce false negatives, the costliest error in a clinical setting.',
     repoUrl: 'https://example.com/repo/clasificacion-radiografias-torax',
     liveUrl: null,
     isFeatured: false,
@@ -275,11 +275,10 @@ export const demoExperiences: DemoExperience[] = [
     roleEs: 'Desarrollador, analista y arquitecto de bases de datos',
     roleEn: 'Developer, analyst and database architect',
     descriptionEs:
-      'Desarrollo y mantenimiento de sistemas internos, relevamiento con las áreas usuarias y diseño de las bases de datos.',
+      'Desarrollo de sistemas de gestión de programas sociales con PHP, Laravel y Livewire. Diseño y optimización de bases de datos PostgreSQL y despliegue con CI/CD en GitLab.',
     descriptionEn:
-      'Development and maintenance of internal systems, requirements gathering with user teams and database design.',
-    // Placeholder start date: the real one is loaded later through the API or the panel.
-    startDate: '2023-01-01',
+      'Development of social program management systems with PHP, Laravel and Livewire. PostgreSQL database design and optimization, and deployment with GitLab CI/CD.',
+    startDate: '2025-05-01',
     endDate: null,
     sortOrder: 0,
     technologySlugs: ['laravel', 'livewire', 'postgresql', 'gitlab-ci-cd', 'sql'],
