@@ -117,6 +117,13 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 | Aviso de servidor lento                    | i18n `notice.slow`                                                                           |
 | «Cargando…», solo lectores de pantalla     | i18n `common.loading`                                                                        |
 
+**Qué error ve la persona** (`lib/apiErrors.ts`; el `message` del servidor nunca se muestra):
+
+- `NETWORK_ERROR` (status 0: red, CORS o DNS) → `errors.network`, con «Reintentar».
+- `TIMEOUT` (status 0, a los 60 s) → `errors.timeout`, con «Reintentar».
+- `INVALID_RESPONSE` (no es el envelope JSON; **conserva el status HTTP**, por ejemplo 502 de Render) y cualquier 5xx → `errors.server`, con «Reintentar».
+- 400 → `errors.invalid` (el formulario muestra errores por campo); 404 → página 404; 429 → `form.errors.rateLimited`; 403 y el resto → `errors.generic`.
+
 ## Relleno del canvas que no se usa
 
 Los cuatro proyectos de ejemplo, las categorías fijas, el email `[tu@email.com]`, los enlaces `#` de «Ver detalle», GitHub y LinkedIn, y el texto «[Captura del proyecto]».

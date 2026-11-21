@@ -208,7 +208,7 @@ Una miniatura cambia la imagen principal (grupo de botones con `aria-current`, s
 - `Content-Type` solo cuando hay body (hoy se envía también en los GET, y entre dominios eso obliga a un preflight `OPTIONS` antes de cada GET; además deja listo el `FormData` de la Fase 7).
 - `credentials` pasa a ser opción por llamada; el sitio público no usa cookies.
 - Respeta la `AbortSignal` de TanStack Query y agrega un tope de 60 s.
-- Red caída, timeout y cuerpo que no es JSON (por ejemplo el 502 de Render) se vuelven `ApiError` con `status` 0 y `code` `NETWORK_ERROR` o `TIMEOUT` (o el código correspondiente).
+- Red caída y timeout se vuelven `ApiError` con `status` 0 y `code` `NETWORK_ERROR` o `TIMEOUT`. Una respuesta que no es el envelope JSON (por ejemplo la página del 502 de Render, o HTML por una `VITE_API_URL` equivocada) se vuelve `ApiError` con `code` `INVALID_RESPONSE` y **conserva su `status` HTTP**. Desviación respecto de la primera versión de este plan, que le daba `status` 0: sin el status real, la regla de reintentos (502, 503 y 504) no reconocería esa página. Solo red caída y timeout llevan 0.
 - Capa `services/*.service.ts` que desenvuelve `data`. Los hooks de TanStack Query incluyen el idioma en la clave (`['projects', lang]`).
 - Defaults de Query: `staleTime` 5 min, sin refetch al enfocar la ventana, mutaciones sin reintento.
 - `patch` y multipart quedan para la Fase 7.
