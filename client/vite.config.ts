@@ -20,6 +20,8 @@ export default defineConfig({
       // West of UTC, like the site's visitors: a date read in local time slips to the day before.
       TZ: 'America/Argentina/Buenos_Aires',
     },
+    // Vitest empties CSS by default; the contrast test reads the real tokens.
+    css: { include: [/tokens\.css/] },
     restoreMocks: true,
     unstubGlobals: true,
   },

@@ -8,17 +8,47 @@
   --color-border: #e4e4e7;
   --color-accent: #0f766e;
 
+  /* Cards. */
+  --color-surface: #ffffff;
+  /* Soft backgrounds, chips and skeletons. */
+  --color-subtle: #f4f4f5;
+  /* Borders of buttons and chips, and their hover. */
+  --color-border-strong: #d4d4d8;
+  --color-border-hover: #a1a1aa;
+  /* Text on chips. */
+  --color-fg-soft: #3f3f46;
+  /* Field background on the dark panel, and hover of the ghost button. */
+  --color-ink: #27272a;
+  /* Field border on the dark panel: about 3.7:1 on #18181B (#52525B gives 2.3:1, under 3:1). */
+  --color-border-field: #71717a;
+  /* Focus ring: dark on the page, light inside the dark panel (the dark one would not show). */
+  --color-focus-ring: #18181b;
+  --color-focus-ring-inverse: #fafaf9;
+
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   --radius-card: 16px;
+  --radius-panel: 24px;
   --radius-pill: 9999px;
 
   --container-page: 1040px;
 }
 
-body {
-  background-color: var(--color-bg);
-  color: var(--color-fg);
-  font-family: var(--font-sans);
+/* Inside a dark surface (the contact panel), focus rings switch to the light color. */
+@utility on-dark {
+  --focus-ring-color: var(--color-focus-ring-inverse);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring-color, var(--color-focus-ring));
+    outline-offset: 3px;
+  }
 }
