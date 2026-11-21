@@ -17,6 +17,17 @@ const cloudinary = {
   CLOUDINARY_API_SECRET: 'secret',
 };
 
+describe('HOST', () => {
+  it('defaults to loopback when unset or empty', () => {
+    expect(envSchema.parse(base).HOST).toBe('127.0.0.1');
+    expect(envSchema.parse({ ...base, HOST: '' }).HOST).toBe('127.0.0.1');
+  });
+
+  it('keeps an explicit value', () => {
+    expect(envSchema.parse({ ...base, HOST: '0.0.0.0' }).HOST).toBe('0.0.0.0');
+  });
+});
+
 describe('CLIENT_ORIGIN', () => {
   const parse = (CLIENT_ORIGIN: string) => envSchema.safeParse({ ...base, CLIENT_ORIGIN });
 
