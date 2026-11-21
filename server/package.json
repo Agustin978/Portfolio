@@ -8,6 +8,7 @@
     "build": "prisma generate && tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "test": "prisma generate && vitest run",
+    "typecheck": "prisma generate && tsc -p tsconfig.json",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
