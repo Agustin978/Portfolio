@@ -163,7 +163,7 @@ Fechas con `Intl.DateTimeFormat` según el idioma, con `timeZone: 'UTC'` (con `n
 ```
 
 - Campos: fondo `ink`, borde `border-field`, texto `#FAFAF9`. Etiquetas siempre visibles (no solo placeholder). Foco con `focus-ring` claro. Botón «Enviar» como `btn-light` del diseño.
-- Botones de correo (`publicEmail`, `mailto:`, oculto si es null) y de redes: píldoras con ícono SVG de 16 px decorativo antes del texto. Etiqueta i18n `social.<platform>` con respaldo al nombre capitalizado. Íconos: solo GitHub y LinkedIn, con los paths fieles de Simple Icons (CC0, copiados con atribución y sin agregar la librería; LinkedIn sale de la 13.21.0, la última que lo incluyó). Cualquier otra plataforma usa un ícono genérico de enlace. Las etiquetas `social.<platform>` siguen existiendo para X, Instagram, YouTube y GitLab.
+- Botones de correo (`publicEmail`, `mailto:`, oculto si es null) y de redes: píldoras con ícono SVG de 16 px decorativo antes del texto. Etiqueta i18n `social.<platform>` con respaldo al nombre capitalizado. Íconos: solo GitHub lleva su marca, con el path fiel de Simple Icons (CC0, copiado con atribución y sin agregar la librería). LinkedIn usa el ícono genérico de enlace: Simple Icons lo retiró en la 14.0.0 y no se usa una versión vieja; si se quiere su logo, se toma de los recursos oficiales de LinkedIn. Cualquier otra plataforma también usa el genérico. Las etiquetas `social.<platform>` siguen existiendo para LinkedIn, X, Instagram, YouTube y GitLab.
 
 **Detalle de proyecto** (`/:lang/projects/:slug`):
 
