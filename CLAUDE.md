@@ -18,6 +18,13 @@ Windows + PowerShell, Node 24.22.1 con el npm que trae (11.19.1), PostgreSQL 17 
 - La versión se fija por Node: `.nvmrc` exacto, `engines.node` `>=24.22.1 <25` y `engines.npm` `>=11.19.1` como mínimo, sin `engine-strict`. Cada Node trae su npm; npm no se actualiza aparte ni se instala global.
 - Node se gestiona con `fnm` en todas las computadoras (`fnm env --use-on-cd` en el perfil de PowerShell toma el `.nvmrc`).
 - Primera instalación y cambio de rama: `npm ci` (no toca el lockfile). `npm install` solo para agregar o quitar dependencias. Si hay que regenerar `package-lock.json`, va en un commit aparte con la versión fijada. Mientras una computadora no coincida con el pin, no se commitea desde ella.
+- **Procesos y puertos** (reglas para el agente):
+  - Ningún servidor queda corriendo entre una acción y otra: lo que se inicia se detiene en la misma tarea, por PID y con su árbol (`taskkill /PID <pid> /T /F`), y se verifica que el puerto quedó libre (`Get-NetTCPConnection -LocalPort <puerto> -State Listen`).
+  - Nunca cerrar por nombre (`Stop-Process -Name node`, `taskkill /IM node.exe`): en la máquina corren procesos node de Claude Code, VS Code y otros.
+  - Para verificar la API a mano, `npm run build` y `node dist/server.js` (un solo proceso), no `tsx` ni `tsx watch`: lanzan un node hijo que en Windows queda huérfano al cerrar el padre. Para tests, supertest, sin puertos reales.
+  - Prohibido `--host`, `0.0.0.0` y exponer puertos en desarrollo. Nada en segundo plano sin un cierre explícito en la misma tarea.
+  - Si un proceso no responde, no se deja: se cierra por PID y se reporta.
+  - Hoy `app.listen(env.PORT)` no fija dirección y escucha en todas las interfaces (`0.0.0.0` y `::`). Pendiente de decisión del dueño; mientras tanto, no dejarlo corriendo.
 - npm 11.19.1 saltea los scripts de instalación no aprobados (`@prisma/engines`, `argon2`, `esbuild`, `prisma`). Hoy no hacen falta: lint, tests, build y Prisma funcionan sin ellos. No aprobarlos sin consultar.
 
 ## Ramas
