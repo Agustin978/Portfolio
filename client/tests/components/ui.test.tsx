@@ -105,18 +105,21 @@ describe('SocialIcon', () => {
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it.each(['github', 'linkedin', 'x', 'instagram', 'youtube', 'gitlab', 'GitHub'])(
-    'has its own icon for %s',
+  it.each(['github', 'linkedin', 'GitHub', 'LinkedIn'])(
+    'uses the brand icon for %s',
     (platform) => {
       const { container } = render(<SocialIcon platform={platform} />);
       expect(container.querySelector('svg')).toHaveAttribute('data-icon', platform.toLowerCase());
     },
   );
 
-  it('falls back to a generic icon for an unknown platform', () => {
-    const { container } = render(<SocialIcon platform="mastodon" />);
-    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'generic');
-  });
+  it.each(['x', 'instagram', 'youtube', 'gitlab', 'mastodon'])(
+    'uses the generic link icon for %s',
+    (platform) => {
+      const { container } = render(<SocialIcon platform={platform} />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'generic');
+    },
+  );
 });
 
 describe('small blocks', () => {

@@ -1,94 +1,21 @@
-import type { ReactNode } from 'react';
-
-// Own inline SVGs (no icon library), 16 px and decorative: the link text names the platform.
-// All are drawn on a 16x16 grid with currentColor, so they follow the button's text color.
-
-const filled = (path: string) => <path d={path} fill="currentColor" />;
-
-const icons: Record<string, ReactNode> = {
-  github: filled(
-    'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z',
-  ),
-  linkedin: (
-    <>
-      <rect
-        x="0.75"
-        y="0.75"
-        width="14.5"
-        height="14.5"
-        rx="2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle cx="4.75" cy="4.75" r="1" fill="currentColor" />
-      <path
-        d="M4.75 7v4.5M7.75 11.5V7m0 2a1.75 1.75 0 0 1 3.5 0v2.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </>
-  ),
-  x: (
-    <path
-      d="M2 2l12 12M14 2L2 14"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  ),
-  instagram: (
-    <>
-      <rect
-        x="1"
-        y="1"
-        width="14"
-        height="14"
-        rx="4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="12" cy="4" r="0.9" fill="currentColor" />
-    </>
-  ),
-  youtube: (
-    <>
-      <rect
-        x="0.75"
-        y="2.75"
-        width="14.5"
-        height="10.5"
-        rx="3"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path d="M6.5 5.5v5L10.5 8z" fill="currentColor" />
-    </>
-  ),
-  gitlab: filled('M8 14.6 1 9.5l.8-2.6L3.5 1.4l1.9 5.5h5.2l1.9-5.5 1.7 5.5.8 2.6z'),
+// Inline SVGs (no icon library), 16 px and decorative: the link text names the platform.
+// Paths copied verbatim from Simple Icons (https://simpleicons.org, package released under CC0-1.0),
+// drawn on a 24x24 grid with currentColor so they follow the button's text color. The marks
+// remain trademarks of their owners and are used only to link to the owner's profile there:
+// - GitHub: simple-icons@16.36.0, icons/github.svg (guidelines: https://github.com/logos).
+// - LinkedIn: simple-icons@13.21.0, icons/linkedin.svg, the last release that included it (it was
+//   removed in 14.0.0; guidelines: https://brand.linkedin.com/policies).
+const brandPaths: Record<string, string> = {
+  github:
+    'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12',
+  linkedin:
+    'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
 };
 
-// Unknown platforms get a plain link glyph.
-const generic = (
-  <path
-    d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-  />
-);
+export const hasOwnIcon = (platform: string) => Object.hasOwn(brandPaths, platform.toLowerCase());
 
-export const hasOwnIcon = (platform: string) => Object.hasOwn(icons, platform.toLowerCase());
-
-export function SocialIcon({ platform }: { platform: string }) {
-  const key = platform.toLowerCase();
+// Any other platform gets a plain link glyph (own drawing, 16x16 grid).
+function GenericLinkIcon() {
   return (
     <svg
       aria-hidden="true"
@@ -96,9 +23,32 @@ export function SocialIcon({ platform }: { platform: string }) {
       width="16"
       height="16"
       viewBox="0 0 16 16"
-      data-icon={hasOwnIcon(key) ? key : 'generic'}
+      data-icon="generic"
     >
-      {hasOwnIcon(key) ? icons[key] : generic}
+      <path
+        d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function SocialIcon({ platform }: { platform: string }) {
+  const key = platform.toLowerCase();
+  if (!hasOwnIcon(key)) return <GenericLinkIcon />;
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      data-icon={key}
+    >
+      <path d={brandPaths[key]} fill="currentColor" />
     </svg>
   );
 }

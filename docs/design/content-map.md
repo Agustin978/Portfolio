@@ -92,19 +92,19 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 
 ## Contacto
 
-| Texto                                             | Fuente                                                                                                               |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| «Trabajemos juntos.»                              | i18n `contact.title`                                                                                                 |
-| «Estoy abierto a oportunidades…»                  | `/profile` → `availability`; si es `null`, i18n `contact.lead`                                                       |
-| Botón de correo                                   | `/profile` → `publicEmail` (`mailto:`; oculto si es `null`)                                                          |
-| GitHub / LinkedIn y otras redes                   | `/social-links` → `platform` y `url`; etiqueta i18n `social.<platform>`, si no hay clave el nombre capitalizado      |
-| Etiquetas Nombre / Email / Mensaje                | i18n `form.name`, `form.email`, `form.message`                                                                       |
-| Contador «0/5000»                                 | i18n `form.counter` (el límite sale del esquema)                                                                     |
-| «Enviar mensaje», «Enviando…»                     | i18n `form.submit`, `form.sending`                                                                                   |
-| Errores por campo                                 | i18n `form.errors.*` (`required`, `nameTooLong`, `nameInvalid`, `emailInvalid`, `messageTooShort`, `messageTooLong`) |
-| Envío limitado (429)                              | i18n `form.errors.rateLimited`                                                                                       |
-| Éxito «Recibí tu mensaje» y «Enviar otro mensaje» | i18n `form.success.title`, `form.success.body`, `form.success.again`                                                 |
-| Alternativa «escribime a {correo}»                | i18n `form.fallback` + `publicEmail` (sin `publicEmail`, no se muestra)                                              |
+| Texto                                             | Fuente                                                                                                                                                                                       |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| «Trabajemos juntos.»                              | i18n `contact.title`                                                                                                                                                                         |
+| «Estoy abierto a oportunidades…»                  | `/profile` → `availability`; si es `null`, i18n `contact.lead`                                                                                                                               |
+| Botón de correo                                   | `/profile` → `publicEmail` (`mailto:`; oculto si es `null`)                                                                                                                                  |
+| GitHub / LinkedIn y otras redes                   | `/social-links` → `platform` y `url`; etiqueta i18n `social.<platform>`, si no hay clave el nombre capitalizado. Ícono: GitHub y LinkedIn (Simple Icons); cualquier otra, genérico de enlace |
+| Etiquetas Nombre / Email / Mensaje                | i18n `form.name`, `form.email`, `form.message`                                                                                                                                               |
+| Contador «0/5000»                                 | i18n `form.counter` (el límite sale del esquema)                                                                                                                                             |
+| «Enviar mensaje», «Enviando…»                     | i18n `form.submit`, `form.sending`                                                                                                                                                           |
+| Errores por campo                                 | i18n `form.errors.*` (`required`, `nameTooLong`, `nameInvalid`, `emailInvalid`, `messageTooShort`, `messageTooLong`)                                                                         |
+| Envío limitado (429)                              | i18n `form.errors.rateLimited`                                                                                                                                                               |
+| Éxito «Recibí tu mensaje» y «Enviar otro mensaje» | i18n `form.success.title`, `form.success.body`, `form.success.again`                                                                                                                         |
+| Alternativa «escribime a {correo}»                | i18n `form.fallback` + `publicEmail` (sin `publicEmail`, no se muestra)                                                                                                                      |
 
 ## Errores, 404 y estados
 

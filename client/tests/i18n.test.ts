@@ -40,6 +40,7 @@ describe('i18n files', () => {
     const used = [
       ...Object.values(ERROR_MESSAGE_KEYS),
       ...SKILL_GROUPS.map((group) => `skills.groups.${group}`),
+      // Button labels, not icons: they keep the brand's casing (YouTube, GitLab).
       ...['github', 'linkedin', 'x', 'instagram', 'youtube', 'gitlab'].map((p) => `social.${p}`),
     ];
     for (const key of used) expect(esKeys, key).toHaveProperty([key]);
