@@ -397,4 +397,4 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 
 - Fase 7: `patch` y multipart en `apiClient`, reordenamiento atómico de imágenes, panel.
 - Fase 8: SEO, prerender, autoalojar las fuentes Geist, auditoría de accesibilidad y Lighthouse, workflow de CI (lint, typecheck y tests con Postgres en cada PR) en una rama `chore/ci`.
-- Fase 9: `BASE_URL` y cookies entre dominios (`SameSite=None` y Safari), dominio propio de Resend, `_redirects` y CSP, `NODE_VERSION` (24.22.1) y ping de mantenimiento. Verificar en el primer deploy que el build no dependa de los scripts de instalación que npm 11.19.1 saltea (sección 21).
+- Fase 9: `BASE_URL` y cookies entre dominios (`SameSite=None` y Safari), dominio propio de Resend, `_redirects` y CSP, `NODE_VERSION` (24.22.1) y ping de mantenimiento. Verificar en el primer deploy que el build no dependa de los scripts de instalación que npm 11.19.1 saltea (sección 21). Render requiere `HOST=0.0.0.0` en sus variables: la API escucha en `127.0.0.1` por defecto y, sin esa variable, Render no detecta el puerto y el deploy falla sin exponer nada (falla de forma segura).

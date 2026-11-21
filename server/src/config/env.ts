@@ -28,6 +28,11 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4000),
+    // Loopback by default so a dev server is never reachable from the local network. Hosts that
+    // route traffic from outside the machine (Render) must set 0.0.0.0 explicitly; without it
+    // their health check never sees the port and the deploy fails instead of going live.
+    // Empty counts as unset, like the optional keys below.
+    HOST: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).default('127.0.0.1')),
     // Reduced to its origin here so CORS (plain-text match in the browser) and the origin guard
     // see the same value; "https://app.example.com/" would otherwise block every cross-site call.
     // Other schemes parse but have the opaque origin "null", so they are refused.

@@ -24,7 +24,7 @@ Windows + PowerShell, Node 24.22.1 con el npm que trae (11.19.1), PostgreSQL 17 
   - Para verificar la API a mano, `npm run build` y `node dist/server.js` (un solo proceso), no `tsx` ni `tsx watch`: lanzan un node hijo que en Windows queda huérfano al cerrar el padre. Para tests, supertest, sin puertos reales.
   - Prohibido `--host`, `0.0.0.0` y exponer puertos en desarrollo. Nada en segundo plano sin un cierre explícito en la misma tarea.
   - Si un proceso no responde, no se deja: se cierra por PID y se reporta.
-  - Hoy `app.listen(env.PORT)` no fija dirección y escucha en todas las interfaces (`0.0.0.0` y `::`). Pendiente de decisión del dueño; mientras tanto, no dejarlo corriendo.
+  - La API escucha solo en `127.0.0.1` (`app.listen(env.PORT, env.HOST)`, `HOST` por defecto `127.0.0.1` en `config/env.ts`). En desarrollo no se define `HOST` ni se cambia a otra dirección. Solo Render usa `HOST=0.0.0.0` (Fase 9).
 - npm 11.19.1 saltea los scripts de instalación no aprobados (`@prisma/engines`, `argon2`, `esbuild`, `prisma`). Hoy no hacen falta: lint, tests, build y Prisma funcionan sin ellos. No aprobarlos sin consultar.
 
 ## Ramas
