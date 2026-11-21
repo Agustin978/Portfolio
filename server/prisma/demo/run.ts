@@ -170,19 +170,29 @@ export async function runSeedDemo({
   // Deactivated projects count too: the slug is unique across them.
   const existingProjects = await projects.list({ includeDeactivated: true });
   for (const project of demoProjects) {
-    if (existingProjects.some((row) => row.slug === project.slug)) {
+    const existing = existingProjects.find((row) => row.slug === project.slug);
+    if (!existing) {
+      await createProject(project);
+    } else if (await isUnfinished(existing)) {
+      await recoverProject(project, existing.id);
+    } else {
       report.skipped.push(`proyecto ${project.slug}`);
-      continue;
     }
-    await seedProject(project);
   }
 
-  async function seedProject(project: DemoProject) {
+  // The one exception to "never modify": an active draft with no image at all is what a run
+  // without Cloudinary or a failed upload leaves behind, so it gets its images and is published.
+  // A draft with some images may have been edited by hand, so it is left alone.
+  async function isUnfinished(row: (typeof existingProjects)[number]) {
+    if (!storageConfigured || row.status !== 'draft' || row.deactivatedAt !== null) return false;
+    return (await projects.get(row.id)).images.length === 0;
+  }
+
+  async function createProject(project: DemoProject) {
     const categoryId = categoryIds.get(project.categorySlug);
     if (categoryId === undefined) {
       throw new Error(`Demo content references unknown category ${project.categorySlug}`);
     }
-    const { images } = project;
 
     // Created as a draft: publishing needs a cover, which only exists after the first upload.
     const created = await projects.create(
@@ -193,20 +203,36 @@ export async function runSeedDemo({
       report.created.push(`proyecto ${project.slug} (borrador, sin imágenes)`);
       return;
     }
+    if (await publishWithImages(project, created.id)) {
+      report.created.push(
+        `proyecto ${project.slug} (publicado, ${project.images.length} imágenes)`,
+      );
+    }
+  }
 
+  async function recoverProject(project: DemoProject, id: number) {
+    if (await publishWithImages(project, id)) {
+      report.created.push(
+        `proyecto ${project.slug} (recuperado: era borrador sin imágenes; publicado, ${project.images.length} imágenes)`,
+      );
+    }
+  }
+
+  async function publishWithImages(project: DemoProject, id: number) {
     try {
-      for (const image of images) {
+      for (const image of project.images) {
         const alt = uploadImageBody.parse({
           altEs: `Imagen de ejemplo: ${project.titleEs}`,
           altEn: `Placeholder image: ${project.titleEn}`,
         });
-        await projectImages.upload(created.id, await placeholderImage(image.color), alt);
+        await projectImages.upload(id, await placeholderImage(image.color), alt);
       }
-      await projects.update(created.id, updateProjectBody.parse({ status: 'published' }));
-      report.created.push(`proyecto ${project.slug} (publicado, ${images.length} imágenes)`);
+      await projects.update(id, updateProjectBody.parse({ status: 'published' }));
+      return true;
     } catch (error) {
-      // Left as a draft; a re-run skips it because the slug now exists.
+      // Left as a draft. A re-run recovers it only if no image got through.
       report.failed.push(`proyecto ${project.slug}: quedó en borrador (${describeError(error)})`);
+      return false;
     }
   }
 
@@ -236,7 +262,7 @@ export async function runSeedDemo({
   if (!storageConfigured) {
     report.warnings.push(
       'Cloudinary no está configurado: los proyectos quedaron en borrador y sin imágenes, así que no se ven en el sitio. ' +
-        'Configurá CLOUDINARY_* en .env y completalos desde la API (el seed no modifica proyectos existentes).',
+        'Configurá CLOUDINARY_* en .env y volvé a correr el seed: completa los borradores que sigan sin imágenes.',
     );
   }
 

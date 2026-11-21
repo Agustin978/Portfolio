@@ -18,7 +18,14 @@ import { createProjectsService } from '../src/modules/projects/projects.service.
 import { createSocialLinkBody } from '../src/modules/social-links/social-links.schemas.js';
 import { createTechnologyBody } from '../src/modules/technologies/technologies.schemas.js';
 import { fakeStorage } from './helpers/fakeStorage.js';
-import { createTestDb, resetDb, type TestDb } from './helpers/testDb.js';
+import {
+  attachImage,
+  createCategory,
+  createProject,
+  createTestDb,
+  resetDb,
+  type TestDb,
+} from './helpers/testDb.js';
 
 const totalImages = demoProjects.reduce((sum, project) => sum + project.images.length, 0);
 
@@ -224,5 +231,59 @@ describe('runSeedDemo', { timeout: 60_000 }, () => {
     expect(await db.project.count({ where: { status: 'draft' } })).toBe(demoProjects.length);
     expect(await db.experience.count()).toBe(demoExperiences.length);
     expect(await db.socialLink.count()).toBe(demoSocialLinks.length);
+  });
+
+  it('recovers the imageless drafts of a run without Cloudinary', async () => {
+    await run(false);
+
+    const report = await run();
+
+    expect(report.failed).toEqual([]);
+    expect(report.created.filter((line) => line.includes('recuperado'))).toHaveLength(
+      demoProjects.length,
+    );
+    expect(fakeStorage.upload).toHaveBeenCalledTimes(totalImages);
+    expect(await db.project.count({ where: { status: 'published' } })).toBe(demoProjects.length);
+    expect(await db.project.count()).toBe(demoProjects.length);
+  });
+
+  it('recovers the drafts left by a failed upload once uploads work again', async () => {
+    fakeStorage.failUpload = true;
+    await run();
+    fakeStorage.failUpload = false;
+
+    const report = await run();
+
+    expect(report.failed).toEqual([]);
+    expect(await db.project.count({ where: { status: 'published' } })).toBe(demoProjects.length);
+    expect(await db.image.count()).toBe(totalImages);
+  });
+
+  it('leaves alone drafts that have an image or are deactivated', async () => {
+    const category = await createCategory(db);
+    const withImage = await createProject(db, category.id, { slug: 'rucvm', titleEs: 'A mano' });
+    await attachImage(db, withImage.id);
+    const deactivated = await createProject(db, category.id, {
+      slug: 'laboratorios-de-redes',
+      deactivatedAt: new Date(),
+    });
+
+    const report = await run();
+
+    expect(report.skipped).toEqual(
+      expect.arrayContaining(['proyecto rucvm', 'proyecto laboratorios-de-redes']),
+    );
+    const rucvm = await db.project.findUniqueOrThrow({
+      where: { id: withImage.id },
+      include: { images: true },
+    });
+    expect(rucvm).toMatchObject({ status: 'draft', titleEs: 'A mano' });
+    expect(rucvm.images).toHaveLength(1);
+    const labs = await db.project.findUniqueOrThrow({
+      where: { id: deactivated.id },
+      include: { images: true },
+    });
+    expect(labs.status).toBe('draft');
+    expect(labs.images).toHaveLength(0);
   });
 });

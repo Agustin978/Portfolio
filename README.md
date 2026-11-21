@@ -70,7 +70,8 @@ npm run db:seed-demo -w server
 - **Solo desarrollo:** se niega a correr con `NODE_ENV=production` o si la base no termina en `_dev`.
 - **Una sola computadora:** todas suben a la misma carpeta de Cloudinary (`portfolio/development`), pero cada una tiene su propia base. Si lo corrés en dos, quedan archivos en Cloudinary que ninguna base conoce.
 - **No pisa nada:** busca cada cosa antes de crearla (categorías y proyectos por slug, tecnologías por nombre, experiencias por empresa, redes por plataforma) y saltea lo que ya existe. Del perfil solo completa los campos vacíos y el nombre de relleno. Correrlo de nuevo no crea ni sube nada. Al terminar lista lo creado y lo salteado.
-- **Sin Cloudinary configurado** (`CLOUDINARY_*` vacías): los proyectos quedan en borrador y sin imágenes, así que no se ven en el sitio, y el script lo avisa. Como no modifica proyectos existentes, para publicarlos después hay que subirles una imagen y publicarlos por la API.
+- **Sin Cloudinary configurado** (`CLOUDINARY_*` vacías): los proyectos quedan en borrador y sin imágenes, así que no se ven en el sitio, y el script lo avisa.
+- **Recuperación:** única excepción a «no pisa nada». Un proyecto que existe, está en borrador, activo y sin ninguna imagen (lo que deja una corrida sin Cloudinary o una subida fallida) recibe sus imágenes y se publica en la siguiente corrida con Cloudinary. Un borrador con alguna imagen o desactivado no se toca.
 - Cada corrida con Cloudinary sube 6 imágenes y consume cuota gratuita.
 
 ## Comandos
