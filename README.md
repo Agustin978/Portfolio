@@ -24,6 +24,7 @@ node -v            # v24.22.1
 npm -v             # 11.19.1
 npm ci
 Copy-Item .env.example .env
+Copy-Item client/.env.example client/.env
 ```
 
 `npm ci` instala exactamente lo que dice `package-lock.json` sin modificarlo; usalo también al cambiar de rama. `npm install` solo para agregar o quitar dependencias. npm avisa que saltea los scripts de instalación de `@prisma/engines`, `argon2`, `esbuild` y `prisma`: es esperado, el proyecto funciona sin ellos y no hace falta aprobarlos.
@@ -51,7 +52,9 @@ npm run db:migrate -w server
 npm run db:seed -w server
 ```
 
-`npm test` necesita `TEST_DATABASE_URL`. Las migraciones se aplican solas antes de correr.
+`npm test` necesita `TEST_DATABASE_URL` para el servidor; los tests del cliente no usan red ni base. Las migraciones se aplican solas antes de correr.
+
+El cliente tiene su propio `client/.env` con una sola variable, `VITE_API_URL`: el origen de la API (por ejemplo `https://api.ejemplo.com`, sin `/api/v1`). En desarrollo va vacía y Vite reenvía `/api` al servidor local.
 
 ```powershell
 npm run dev
@@ -77,15 +80,16 @@ npm run db:seed-demo -w server
 
 ## Comandos
 
-| Comando                | Qué hace                       |
-| ---------------------- | ------------------------------ |
-| `npm ci`               | Instala desde el lockfile      |
-| `npm run dev`          | Cliente y servidor juntos      |
-| `npm run lint`         | ESLint                         |
-| `npm run format`       | Prettier (escribe los cambios) |
-| `npm run format:check` | Prettier (solo verifica)       |
-| `npm test`             | Tests (Vitest + supertest)     |
-| `npm run build`        | Build de cliente y servidor    |
+| Comando                | Qué hace                             |
+| ---------------------- | ------------------------------------ |
+| `npm ci`               | Instala desde el lockfile            |
+| `npm run dev`          | Cliente y servidor juntos            |
+| `npm run lint`         | ESLint                               |
+| `npm run format`       | Prettier (escribe los cambios)       |
+| `npm run format:check` | Prettier (solo verifica)             |
+| `npm test`             | Tests de cliente y servidor (Vitest) |
+| `npm run typecheck`    | Tipos de cliente y servidor          |
+| `npm run build`        | Build de cliente y servidor          |
 
 ## Flujo de trabajo
 

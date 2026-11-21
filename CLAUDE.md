@@ -7,7 +7,7 @@ Sitio público bilingüe (es/en) con proyectos y experiencia laboral, formulario
 - Monorepo con npm workspaces: `client/` y `server/`. TypeScript 6 (`typescript@6`, NO la 7: typescript-eslint no la soporta todavía).
 - Cliente: React 19, Vite 8, Tailwind CSS 4 con `@tailwindcss/vite` (sin `tailwind.config.js`), `react-router` 8 (paquete `react-router`, no `react-router-dom`), `@tanstack/react-query`, i18next + react-i18next + i18next-browser-languagedetector, react-hook-form + @hookform/resolvers + zod.
 - Servidor: Express 5, Zod 4, Prisma línea 7 (`prisma@7`, `@prisma/client@7`, `@prisma/adapter-pg@7`, `pg`; NO Prisma 8), argon2, jsonwebtoken, cookie-parser, helmet, cors, express-rate-limit, multer, sharp, cloudinary, resend, dotenv.
-- Herramientas: Vitest + supertest, ESLint + typescript-eslint, Prettier, tsx, concurrently.
+- Herramientas: Vitest + supertest (servidor), Vitest + jsdom + Testing Library (cliente), ESLint + typescript-eslint, Prettier, tsx, concurrently.
 - Producción (gratis): Cloudflare Pages (cliente), Render (API), Neon (PostgreSQL), Cloudinary (imágenes), Resend (email).
 - Se instala por fase solo lo que esa fase usa. Si npm da conflictos de dependencias: no usar `--force` ni `--legacy-peer-deps`; frenar y consultar.
 
@@ -47,6 +47,13 @@ Windows + PowerShell, Node 24.22.1 con el npm que trae (11.19.1), PostgreSQL 17 
 **API**: REST bajo `/api/v1`, rutas en kebab-case. Éxito `{ success: true, data, meta }`; error `{ success: false, error: { code, message, details } }`. Los endpoints públicos devuelven solo contenido publicado, traducido según `?lang=es|en`.
 
 **Cliente**: componentes presentacionales que no hacen fetch; los datos llegan por hooks con TanStack Query y una capa `services/` con `apiClient`. Mobile-first. El idioma va en la URL (`/es`, `/en`); los textos de interfaz viven en `src/i18n/es.json` y `en.json`.
+
+- **Contenido**: cada texto visible sale de la API o de i18n según `docs/design/content-map.md`; nada fijo en el código. Un campo opcional `null` oculta su elemento completo.
+- **API** (`services/apiClient.ts`): `VITE_API_URL` es solo el origen (`client/.env`; vacío = proxy de Vite). `Content-Type` solo con body; cookies solo si la llamada pide `credentials`. Tope de 60 s. Errores como `ApiError`: `NETWORK_ERROR` y `TIMEOUT` con status 0, `INVALID_RESPONSE` para lo que no es el envelope (con su status). `lib/apiErrors.ts` traduce el error a la clave i18n; el `message` del servidor nunca se muestra.
+- **Query** (`app/queryClient.ts`): `staleTime` 5 min, sin refetch al enfocar. Reintenta solo GET con red caída o 502/503/504, dos veces (1 s y 2 s); un timeout no se reintenta. Las mutaciones nunca se reintentan. Hooks en `hooks/queries.ts`, con el idioma en la clave de lo traducible.
+- **Helpers** (`lib/`): `imageUrl` (solo anchos 400/800/1200/1920 y nunca más que la imagen), `dates` (fechas `YYYY-MM-DD` leídas y formateadas en UTC), `safeUrl`/`mailtoHref` (solo http(s); mailto sin `?`/`&`), `paragraphs` (texto plano por líneas en blanco).
+- **i18n**: detección `['path', 'navigator']`; el idioma queda fijado antes del primer render y `<html lang>` lo sigue. Un test exige las mismas claves y placeholders en `es.json` y `en.json`.
+- **Tests** (`client/tests/`): sin red; `tests/helpers/mockApi.ts` reemplaza `fetch` (sin msw). Corren con `TZ` de Argentina para que un error de zona horaria se note en cualquier máquina. El contraste de los tokens se verifica leyendo `tokens.css`.
 
 **Seguridad**: un único admin creado por seed, sin endpoint de registro; JWT de corta duración en cookie httpOnly; rate limit en login y contacto; helmet. En el cliente, todo lo que viene de la API se renderiza como texto: nunca `dangerouslySetInnerHTML`.
 
@@ -105,6 +112,7 @@ npm run dev        # cliente (5173) y servidor (4000) juntos
 npm run lint       # ESLint
 npm run format     # Prettier (escribe)
 npm test           # Vitest en los workspaces
+npm run typecheck  # tipos de ambos (servidor: src, tests y prisma)
 npm run build      # build de ambos
 npm run db:migrate -w server   # crea/aplica migraciones en portfolio_dev
 npm run db:seed -w server      # admin + profile iniciales
@@ -120,15 +128,15 @@ No adelantar fases: al terminar cada una, resumir y frenar.
 
 ## Estado actual y próximos pasos
 
-_Última actualización: 2026-11-13._
+_Última actualización: 2026-11-21._
 
 - Fases 0 y 1: hechas y fusionadas en `dev` (Fase 1: PR #2, seed corrido en `portfolio_dev`).
 - Fase 2: autenticación hecha y fusionada en `dev` (PR #3).
 - Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
 - Fase 4: imágenes hechas y fusionadas en `dev` (PR #6); la prueba manual contra Cloudinary real salió bien.
 - Fase 5: contacto (API) hecho y fusionado en `dev` (PR #7). Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
-- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo), fusionado (PR #8). PR 2: `feature/dev-demo-content` (`db:seed-demo`: código en `server/prisma/demo/`, entrada `server/prisma/seed-demo.ts`; usa los services y los bodies Zod de la API y nunca modifica lo que ya existe, salvo un proyecto en borrador, activo y sin ninguna imagen, al que le sube las imágenes y lo publica).
+- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo), fusionado (PR #8). PR 2: `feature/dev-demo-content` (`db:seed-demo`: código en `server/prisma/demo/`, entrada `server/prisma/seed-demo.ts`; usa los services y los bodies Zod de la API y nunca modifica lo que ya existe, salvo un proyecto en borrador, activo y sin ninguna imagen, al que le sube las imágenes y lo publica), fusionado (PR #9). Aparte, `chore/server-bind-localhost` (PR #10): la API escucha en `127.0.0.1` por defecto. PR 3: `feature/client-foundation` (mapa de contenido, `typecheck`, tests del cliente, `apiClient`, services y hooks, `lib/`, tokens y componentes UI, i18n); la Home provisoria sigue hasta el PR 4.
 - En una máquina nueva: clonar, `fnm install` (lee `.nvmrc`), `npm ci`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm ci` antes de `npm run dev`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: PR 3 de la Fase 6 (`feature/client-foundation`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: PR 4 de la Fase 6 (`feature/site-home`), según el plan. Desde el PR 4, cada PR visual cierra con capturas (solo datos demo; navegador automatizado sin agregar dependencias al repo; mismas reglas de procesos y puertos). Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.
