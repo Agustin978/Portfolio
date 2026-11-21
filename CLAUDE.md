@@ -18,6 +18,13 @@ Windows + PowerShell, Node 24.22.1 con el npm que trae (11.19.1), PostgreSQL 17 
 - La versión se fija por Node: `.nvmrc` exacto, `engines.node` `>=24.22.1 <25` y `engines.npm` `>=11.19.1` como mínimo, sin `engine-strict`. Cada Node trae su npm; npm no se actualiza aparte ni se instala global.
 - Node se gestiona con `fnm` en todas las computadoras (`fnm env --use-on-cd` en el perfil de PowerShell toma el `.nvmrc`).
 - Primera instalación y cambio de rama: `npm ci` (no toca el lockfile). `npm install` solo para agregar o quitar dependencias. Si hay que regenerar `package-lock.json`, va en un commit aparte con la versión fijada. Mientras una computadora no coincida con el pin, no se commitea desde ella.
+- **Procesos y puertos** (reglas para el agente):
+  - Ningún servidor queda corriendo entre una acción y otra: lo que se inicia se detiene en la misma tarea, por PID y con su árbol (`taskkill /PID <pid> /T /F`), y se verifica que el puerto quedó libre (`Get-NetTCPConnection -LocalPort <puerto> -State Listen`).
+  - Nunca cerrar por nombre (`Stop-Process -Name node`, `taskkill /IM node.exe`): en la máquina corren procesos node de Claude Code, VS Code y otros.
+  - Para verificar la API a mano, `npm run build` y `node dist/server.js` (un solo proceso), no `tsx` ni `tsx watch`: lanzan un node hijo que en Windows queda huérfano al cerrar el padre. Para tests, supertest, sin puertos reales.
+  - Prohibido `--host`, `0.0.0.0` y exponer puertos en desarrollo. Nada en segundo plano sin un cierre explícito en la misma tarea.
+  - Si un proceso no responde, no se deja: se cierra por PID y se reporta.
+  - Hoy `app.listen(env.PORT)` no fija dirección y escucha en todas las interfaces (`0.0.0.0` y `::`). Pendiente de decisión del dueño; mientras tanto, no dejarlo corriendo.
 - npm 11.19.1 saltea los scripts de instalación no aprobados (`@prisma/engines`, `argon2`, `esbuild`, `prisma`). Hoy no hacen falta: lint, tests, build y Prisma funcionan sin ellos. No aprobarlos sin consultar.
 
 ## Ramas
@@ -101,6 +108,7 @@ npm test           # Vitest en los workspaces
 npm run build      # build de ambos
 npm run db:migrate -w server   # crea/aplica migraciones en portfolio_dev
 npm run db:seed -w server      # admin + profile iniciales
+npm run db:seed-demo -w server # contenido demo en portfolio_dev (solo desarrollo, una sola máquina)
 npm run db:generate -w server  # regenera el cliente Prisma (src/generated, ignorado por git)
 ```
 
@@ -119,8 +127,8 @@ _Última actualización: 2026-11-13._
 - Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
 - Fase 4: imágenes hechas y fusionadas en `dev` (PR #6); la prueba manual contra Cloudinary real salió bien.
 - Fase 5: contacto (API) hecho y fusionado en `dev` (PR #7). Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
-- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo).
+- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo), fusionado (PR #8). PR 2: `feature/dev-demo-content` (`db:seed-demo`: código en `server/prisma/demo/`, entrada `server/prisma/seed-demo.ts`; usa los services y los bodies Zod de la API y nunca modifica lo que ya existe, salvo un proyecto en borrador, activo y sin ninguna imagen, al que le sube las imágenes y lo publica).
 - En una máquina nueva: clonar, `fnm install` (lee `.nvmrc`), `npm ci`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm ci` antes de `npm run dev`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: PR 2 de la Fase 6 (`feature/dev-demo-content`, script `db:seed-demo`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: PR 3 de la Fase 6 (`feature/client-foundation`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.

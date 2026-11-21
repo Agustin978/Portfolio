@@ -9,6 +9,7 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.ts'],
     globalSetup: ['tests/globalSetup.ts'],
+    setupFiles: ['tests/setup/closeAppDb.ts'],
     // Database tests never touch DATABASE_URL: the app config is pointed at the test database.
     // The placeholder keeps non-database tests (e.g. /health) runnable without one.
     env: {

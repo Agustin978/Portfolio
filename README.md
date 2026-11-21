@@ -59,6 +59,21 @@ npm run dev
 - Cliente: http://localhost:5173 (redirige a `/es` o `/en` según el idioma del navegador)
 - API: http://localhost:4000/api/v1/health (Vite también la expone por proxy en http://localhost:5173/api/v1/health)
 
+### Contenido de demostración (solo desarrollo)
+
+Mientras no exista el panel, `db:seed-demo` carga en `portfolio_dev` contenido de ejemplo: perfil, categorías, tecnologías, 4 proyectos con imágenes de relleno (colores lisos), 2 experiencias (una ficticia) y redes con URLs de `example.com`. Necesita que `db:seed` haya corrido antes.
+
+```powershell
+npm run db:seed-demo -w server
+```
+
+- **Solo desarrollo:** se niega a correr con `NODE_ENV=production` o si la base no termina en `_dev`.
+- **Una sola computadora:** todas suben a la misma carpeta de Cloudinary (`portfolio/development`), pero cada una tiene su propia base. Si lo corrés en dos, quedan archivos en Cloudinary que ninguna base conoce.
+- **No pisa nada:** busca cada cosa antes de crearla (categorías y proyectos por slug, tecnologías por nombre, experiencias por empresa, redes por plataforma) y saltea lo que ya existe. Del perfil solo completa los campos vacíos y el nombre de relleno. Correrlo de nuevo no crea ni sube nada. Al terminar lista lo creado y lo salteado.
+- **Sin Cloudinary configurado** (`CLOUDINARY_*` vacías): los proyectos quedan en borrador y sin imágenes, así que no se ven en el sitio, y el script lo avisa.
+- **Recuperación:** única excepción a «no pisa nada». Un proyecto que existe, está en borrador, activo y sin ninguna imagen (lo que deja una corrida sin Cloudinary o una subida fallida) recibe sus imágenes y se publica en la siguiente corrida con Cloudinary. Un borrador con alguna imagen o desactivado no se toca.
+- Cada corrida con Cloudinary sube 6 imágenes y consume cuota gratuita.
+
 ## Comandos
 
 | Comando                | Qué hace                       |

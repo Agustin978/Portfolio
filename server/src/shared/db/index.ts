@@ -5,3 +5,12 @@ import { createPrismaClient } from './prisma.js';
 let client: ReturnType<typeof createPrismaClient> | undefined;
 
 export const getPrisma = () => (client ??= createPrismaClient(env.DATABASE_URL));
+
+// Closes the pool if it was ever opened. Tests call it after each file: otherwise the pool's
+// sockets and timers stay open until the test runner kills the worker.
+export const disconnectPrisma = async () => {
+  if (!client) return;
+  const open = client;
+  client = undefined;
+  await open.$disconnect();
+};
