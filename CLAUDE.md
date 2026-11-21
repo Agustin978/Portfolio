@@ -101,6 +101,7 @@ npm test           # Vitest en los workspaces
 npm run build      # build de ambos
 npm run db:migrate -w server   # crea/aplica migraciones en portfolio_dev
 npm run db:seed -w server      # admin + profile iniciales
+npm run db:seed-demo -w server # contenido demo en portfolio_dev (solo desarrollo, una sola máquina)
 npm run db:generate -w server  # regenera el cliente Prisma (src/generated, ignorado por git)
 ```
 
@@ -119,8 +120,8 @@ _Última actualización: 2026-11-13._
 - Fase 3: API de contenido hecha y fusionada en `dev` (PR #4 y PR #5).
 - Fase 4: imágenes hechas y fusionadas en `dev` (PR #6); la prueba manual contra Cloudinary real salió bien.
 - Fase 5: contacto (API) hecho y fusionado en `dev` (PR #7). Prueba manual completa con Postman (`docs/postman/`) y con Resend real: el correo llega y el mensaje queda `sent`. El formulario del cliente se hace en la Fase 6, junto con el sitio público.
-- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo).
+- Fase 6: sitio público en curso. El plan completo está en `docs/plan-fase-6.md` (fuente de verdad de la fase). PR 1 de la fase: `chore/housekeeping` (pin de Node, `CLIENT_ORIGIN`, README, este archivo), fusionado (PR #8). PR 2: `feature/dev-demo-content` (`db:seed-demo`: código en `server/prisma/demo/`, entrada `server/prisma/seed-demo.ts`; usa los services y los bodies Zod de la API y nunca modifica lo que ya existe).
 - En una máquina nueva: clonar, `fnm install` (lee `.nvmrc`), `npm ci`, crear `.env` desde `.env.example` (incluye `JWT_SECRET` de 32+ caracteres y `ADMIN_PASSWORD` de 12+), crear las bases `portfolio_dev` y `portfolio_test`, `npm run db:generate -w server` (Prisma 7 no lo corre solo y `src/generated` no está en git), `npm run db:migrate -w server`, `npm run db:seed -w server`, `npm test`. Al cambiar a una rama con dependencias nuevas, correr `npm ci` antes de `npm run dev`.
 - Aprendizaje: en un CHECK de PostgreSQL, `NULL` cuenta como cumplido; para exigir un valor hay que agregar `IS NOT NULL` además de `btrim(col) <> ''`.
-- Siguiente: PR 2 de la Fase 6 (`feature/dev-demo-content`, script `db:seed-demo`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
+- Siguiente: PR 3 de la Fase 6 (`feature/client-foundation`), según el plan. Las respuestas actuales no se alteran, solo se agregan campos. Las migraciones ya aplicadas no se editan: se agregan nuevas.
 - Diferido: reordenamiento atómico de imágenes (`PUT .../images/order`), se diseña en la Fase 7 junto con la pantalla del panel.
