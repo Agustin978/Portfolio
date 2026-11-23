@@ -22,13 +22,16 @@ export function SlowResponseNotice() {
   }, [busy]);
 
   // The live region is always in the page, so screen readers announce the text when it appears.
+  // It never takes focus and lets clicks through: reading or tabbing goes on undisturbed.
   return (
     <div
       role="status"
       className="pointer-events-none fixed inset-x-0 bottom-4 z-10 flex justify-center px-4"
     >
       {busy && waited && (
-        <p className="m-0 max-w-md rounded-2xl bg-fg px-5 py-3 text-center text-sm leading-normal text-bg shadow-lg">
+        // The light border and the deep shadow keep it apart from the dark contact panel, which
+        // has the same background.
+        <p className="m-0 max-w-md rounded-2xl border border-border-field bg-fg px-5 py-3 text-center text-sm leading-normal text-bg shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)]">
           {t('notice.slow')}
         </p>
       )}

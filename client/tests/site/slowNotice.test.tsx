@@ -55,6 +55,20 @@ describe('slow server notice', () => {
     expect(status).toBeEmptyDOMElement();
   });
 
+  it('is announced as a status and never takes the focus', async () => {
+    const outside = document.body.appendChild(document.createElement('button'));
+    outside.focus();
+    setup();
+
+    await act(() => vi.advanceTimersByTimeAsync(SLOW_NOTICE_DELAY_MS));
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(NOTICE);
+    expect(document.activeElement).toBe(outside);
+    // Nothing inside can be reached with Tab either.
+    expect(status.querySelectorAll('a, button, [tabindex]')).toHaveLength(0);
+    outside.remove();
+  });
+
   it('never shows up when the answer is quick', async () => {
     const { release } = setup();
     await act(() => vi.advanceTimersByTimeAsync(1000));
