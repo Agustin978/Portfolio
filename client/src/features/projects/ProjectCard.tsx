@@ -5,6 +5,7 @@ import { ResponsiveImage } from '../../components/ui/ResponsiveImage';
 import { Skeleton } from '../../components/ui/Skeleton';
 import type { Language } from '../../i18n/languages';
 import type { ProjectSummary } from '../../services/types';
+import { FROM_LIST } from './backToList';
 
 // Two columns from 800 px (each about 460 px wide), one full-width column below.
 const CARD_IMAGE_SIZES = '(min-width: 800px) 460px, calc(100vw - 40px)';
@@ -49,6 +50,7 @@ export function ProjectCard({ project, lang }: { project: ProjectSummary; lang: 
           {/* The link covers the whole card; its name says which project it opens. */}
           <Link
             to={`/${lang}/projects/${encodeURIComponent(project.slug)}`}
+            state={FROM_LIST}
             aria-label={t('projects.detailFor', { title: project.title })}
             className="inline-flex min-h-11 items-center gap-2 text-[15px] font-medium text-accent no-underline after:absolute after:inset-0 after:content-['']"
           >
