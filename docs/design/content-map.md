@@ -91,6 +91,14 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 - Ambas con valor: «{inicio} — {fin}».
 - Solo `endedAt` con valor: solo «{fin}».
 
+**Reglas de la página y de la sección** (PR 5):
+
+- Experiencia va después de «Sobre mí», con su enlace en el menú en ese orden (`#experiencia`). Se oculta, enlace incluido, solo cuando la API responde una lista vacía; cargando o con error, queda (el error con su «Reintentar»).
+- Las `images` de una experiencia no se muestran: el diseño de la sección no las prevé.
+- `PROJECT_NOT_FOUND` muestra la 404 con `notFound.project`; cualquier otro error deja la página con su «Reintentar». Mientras carga o si falla, el h1 queda oculto con `projects.title`.
+- «← Proyectos»: si se llegó desde una tarjeta, vuelve en el historial (con filtro y scroll); si se abrió directo, enlaza a `/{lang}#proyectos`.
+- `<title>` del detalle: `{title} · {fullName} · {meta.title}`.
+
 ## Contacto
 
 | Texto                                             | Fuente                                                                                                                                                                                       |

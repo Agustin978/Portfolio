@@ -369,6 +369,7 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 4. **`feature/site-home`.** Layout con header, selector de idioma, footer, skip link, `ScrollRestoration`, 404 y aviso de lentitud; hero; sobre mí con skills y redes; proyectos con filtro y tarjetas.
    - Las redes van donde las pone el canvas: en el panel de contacto (título, disponibilidad, correo y redes), que entra en este PR. El formulario se suma a ese panel en el PR 6. El enlace «Experiencia» del menú llega con su sección en el PR 5.
 5. **`feature/site-project-detail-experience`.** Página de detalle con galería y sección de experiencia.
+   - La imagen principal va en un marco 16:9 con `object-contain` (las capturas no se recortan); «Ver sitio» es la píldora oscura y «Ver código» la de borde. Las imágenes de experiencia no se muestran.
 6. **`feature/site-contact`.** Formulario con honeypot, estados e íconos de redes; pasada de estados y responsive; actualización de `CLAUDE.md` y README; cierre de la fase.
 
 ## 19. Node y npm entre computadoras
