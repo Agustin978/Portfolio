@@ -111,10 +111,19 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 | Etiquetas Nombre / Email / Mensaje                | i18n `form.name`, `form.email`, `form.message`                                                                                                                                               |
 | Contador «0/5000»                                 | i18n `form.counter` (el límite sale del esquema)                                                                                                                                             |
 | «Enviar mensaje», «Enviando…»                     | i18n `form.submit`, `form.sending`                                                                                                                                                           |
-| Errores por campo                                 | i18n `form.errors.*` (`required`, `nameTooLong`, `nameInvalid`, `emailInvalid`, `messageTooShort`, `messageTooLong`)                                                                         |
+| Errores por campo                                 | i18n `form.errors.*` (`required`, `nameTooLong`, `nameInvalid`, `emailInvalid`, `messageTooShort`, `messageTooLong`, `messageInvalid`)                                                                         |
 | Envío limitado (429)                              | i18n `form.errors.rateLimited`                                                                                                                                                               |
 | Éxito «Recibí tu mensaje» y «Enviar otro mensaje» | i18n `form.success.title`, `form.success.body`, `form.success.again`                                                                                                                         |
 | Alternativa «escribime a {correo}»                | i18n `form.fallback` + `publicEmail` (sin `publicEmail`, no se muestra)                                                                                                                      |
+
+**Reglas del formulario** (PR 6):
+
+- Esquema espejo de `server/src/modules/contact/contact.schemas.ts` en `features/contact/contactSchema.ts` (un test fija los límites). Cada mensaje es una clave `form.errors.*` con sus valores (`{{min}}`, `{{max}}`) desde el esquema.
+- `messageInvalid` cubre un NUL en el mensaje. También cubre un 400 del servidor: su `details` solo dice qué campo falló, así que cada campo marcado recibe su mensaje genérico (`nameInvalid`, `emailInvalid`, `messageInvalid`) y arriba aparece `errors.invalid`.
+- Payload `{ name, email, message, lang, hp_check }`. Los valores van recortados, `lang` sale de la URL y `hp_check` se manda siempre (vacío).
+- Éxito: `form.success.title` y `form.success.body`. No promete respuesta, porque el 201 no garantiza que el correo salió. El foco va al encabezado.
+- Alternativa por correo: `form.fallback` + `publicEmail`, solo con red caída, timeout o 5xx, junto a «Reintentar». En 429 solo se muestra `form.errors.rateLimited`.
+- El formulario se carga aparte (`React.lazy`). Si su archivo no llega, el panel muestra `errors.network`, «Reintentar» (recarga la página) y la alternativa por correo.
 
 ## Errores, 404 y estados
 

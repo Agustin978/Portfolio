@@ -371,6 +371,11 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 5. **`feature/site-project-detail-experience`.** Página de detalle con galería y sección de experiencia.
    - La imagen principal va en un marco 16:9 con `object-contain` (las capturas no se recortan); «Ver sitio» es la píldora oscura y «Ver código» la de borde. Las imágenes de experiencia no se muestran.
 6. **`feature/site-contact`.** Formulario con honeypot, estados e íconos de redes; pasada de estados y responsive; actualización de `CLAUDE.md` y README; cierre de la fase.
+   - Dependencias instaladas: `react-hook-form` 7.91.0, `@hookform/resolvers` 6.0.2 (se mantuvo la aprobada aunque la 7.x ya cumplía las dos semanas) y `zod` 4.6.7.
+   - El formulario va en un chunk aparte (`React.lazy`): con él adentro el bundle principal pasaba de 447 a 571 kB.
+   - Etiquetas arriba de cada campo, no a la izquierda como en el boceto: en la columna de 1024 px y en el celular no hay ancho para las dos cosas.
+   - Token nuevo `danger-on-dark` (#FCA5A5) para los errores sobre el panel oscuro.
+   - La guía de la prueba manual está en `docs/prueba-manual-fase-6.md`.
 
 ## 19. Node y npm entre computadoras
 
