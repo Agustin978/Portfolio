@@ -1,3 +1,4 @@
+import { AboutSection } from '../about/AboutSection';
 import { ContactSection } from '../contact/ContactSection';
 import { Hero } from '../hero/Hero';
 import { PageTitle } from '../layout/PageTitle';
@@ -10,6 +11,7 @@ export function Home() {
       <PageTitle />
       <Hero />
       <ProjectsSection />
+      <AboutSection />
       <ContactSection />
     </>
   );
