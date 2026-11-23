@@ -16,7 +16,10 @@ describe('home page', () => {
     expect(screen.getByText(profile.intro!)).toBeVisible();
 
     // Header: name as the home link, menu in the page order.
-    expect(screen.getByRole('link', { name: 'Agustín' })).toHaveAttribute('href', '/es');
+    expect(screen.getByRole('link', { name: 'Agustín, ir al inicio' })).toHaveAttribute(
+      'href',
+      '/es',
+    );
     expect(
       within(nav())
         .getAllByRole('link')
@@ -147,6 +150,9 @@ describe('home page', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1, name: 'Portfolio' })).toBeInTheDocument();
     // The name link in the header still has an accessible name.
-    expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute('href', '/es');
+    expect(screen.getByRole('link', { name: 'Portfolio, ir al inicio' })).toHaveAttribute(
+      'href',
+      '/es',
+    );
   }, 10_000);
 });

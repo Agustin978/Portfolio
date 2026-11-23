@@ -4,6 +4,7 @@
   },
   "nav": {
     "skip": "Skip to content",
+    "home": "{{name}}, go to home",
     "label": "Main",
     "projects": "Projects",
     "about": "About me",
@@ -13,7 +14,11 @@
   "language": {
     "label": "Language",
     "es": "ES",
-    "en": "EN"
+    "en": "EN",
+    "names": {
+      "es": "Español",
+      "en": "English"
+    }
   },
   "hero": {
     "projects": "View projects",

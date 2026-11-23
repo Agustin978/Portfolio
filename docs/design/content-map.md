@@ -17,10 +17,10 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `<title>`                                                  | `{fullName} · {meta.title}`; en la 404, `{notFound.title} · {fullName} · {meta.title}`; sin perfil, solo `meta.title` |
 | «Saltar al contenido»                                      | i18n `nav.skip`                                                                                |
-| Logo «Agustín»                                             | `/profile` → `fullName`                                                                        |
+| Logo «Agustín»                                             | `/profile` → `fullName`; nombre accesible y `title`: i18n `nav.home` («{nombre}, ir al inicio»; sin perfil, con `meta.title`) |
 | Menú Proyectos / Sobre mí / Experiencia / Contacto         | i18n `nav.projects`, `nav.about`, `nav.experience`, `nav.contact`                              |
 | Nombre accesible del menú («Principal»)                    | i18n `nav.label`                                                                               |
-| Selector ES / EN                                           | i18n `language.es`, `language.en` (texto visible) y `language.label` (grupo)                   |
+| Selector ES / EN                                           | i18n `language.es`, `language.en` (texto visible), `language.names.es` / `language.names.en` («Español» / «English»: `aria-label` y `title`, cada uno en su idioma) y `language.label` (grupo) |
 | Footer «© 2026 Agustín · San Miguel de Tucumán, Argentina» | Año calculado + `/profile` → `fullName` + `location` (sin `location`, se omite también el «·») |
 | «Volver arriba»                                            | i18n `footer.top`                                                                              |
 

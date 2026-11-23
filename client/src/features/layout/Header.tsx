@@ -21,24 +21,23 @@ export function Header() {
     { id: SECTION_IDS.contact, label: t('nav.contact') },
   ];
 
+  // Without the name yet (or ever, if the profile fails) the link still has one.
+  const homeLabel = t('nav.home', { name: profile.data?.fullName ?? t('meta.title') });
+
   return (
     <header
       className={`${PAGE_COLUMN} flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4`}
     >
       <Link
         to={`/${lang}`}
+        aria-label={homeLabel}
+        title={homeLabel}
         className="inline-flex min-h-11 items-center gap-2.5 text-lg font-semibold tracking-[-0.01em] no-underline"
       >
         <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full bg-accent" />
-        {profile.data ? (
-          profile.data.fullName
-        ) : (
-          <>
-            {/* Without the name yet (or ever, if the profile fails) the link still has one. */}
-            <span className="sr-only">{t('meta.title')}</span>
-            {profile.isPending && <Skeleton className="h-5 w-24" />}
-          </>
-        )}
+        {profile.data
+          ? profile.data.fullName
+          : profile.isPending && <Skeleton className="h-5 w-24" />}
       </Link>
 
       {/* On a phone the menu drops to its own row under the name and the language switcher. */}

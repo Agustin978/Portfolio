@@ -19,11 +19,17 @@ export function LanguageSwitcher() {
     >
       {SUPPORTED_LANGUAGES.map((option) => {
         const active = option === lang;
+        // "ES" alone reads as a word; the name says which language it is. Each name is written in
+        // its own language (lang below) and still starts with the visible code, so voice control
+        // users can say what they see.
+        const name = t(`language.names.${option}`);
         return (
           <Link
             key={option}
             to={`/${option}${rest}${search}${hash}`}
             preventScrollReset
+            aria-label={name}
+            title={name}
             lang={option}
             hrefLang={option}
             aria-current={active ? 'true' : undefined}

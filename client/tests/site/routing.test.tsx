@@ -54,8 +54,8 @@ describe('language switcher', () => {
     renderSite('/es/nothing?category=web#top');
 
     const group = await screen.findByRole('group', { name: 'Idioma' });
-    const es = within(group).getByRole('link', { name: 'ES' });
-    const en = within(group).getByRole('link', { name: 'EN' });
+    const es = within(group).getByRole('link', { name: 'Español' });
+    const en = within(group).getByRole('link', { name: 'English' });
 
     expect(es).toHaveAttribute('aria-current', 'true');
     expect(es).toHaveAttribute('lang', 'es');
@@ -73,7 +73,7 @@ describe('language switcher', () => {
     const { router } = renderSite('/es');
     await screen.findByRole('heading', { level: 1, name: /Desarrollo sistemas web/ });
 
-    await userEvent.click(screen.getByRole('link', { name: 'EN' }));
+    await userEvent.click(screen.getByRole('link', { name: 'English' }));
 
     expect(router.state.location.pathname).toBe('/en');
     expect(
