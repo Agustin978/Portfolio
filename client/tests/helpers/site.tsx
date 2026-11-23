@@ -5,6 +5,8 @@ import { createQueryClient } from '../../src/app/queryClient';
 import { routes } from '../../src/app/router';
 import type {
   Category,
+  Experience,
+  ProjectDetail,
   Profile,
   ProjectSummary,
   SkillGroup,
@@ -73,21 +75,70 @@ export const socialLinks: SocialLink[] = [
   { platform: 'linkedin', url: 'https://example.com/linkedin' },
 ];
 
+// One current position without a company link and one finished with it, like the demo seed.
+export const experiences: Experience[] = [
+  {
+    id: 1,
+    company: 'Ministerio de Desarrollo Social',
+    companyUrl: null,
+    location: 'San Miguel de Tucumán',
+    role: 'Desarrollador y arquitecto de bases de datos',
+    description: 'Primer párrafo del puesto.\n\nSegundo párrafo del puesto.',
+    startDate: '2025-05-01',
+    endDate: null,
+    technologies: [{ slug: 'laravel', name: 'Laravel' }],
+    images: [],
+  },
+  {
+    id: 2,
+    company: 'Empresa Demo',
+    companyUrl: 'https://example.com/empresa',
+    location: null,
+    role: 'Soporte técnico y redes',
+    description: 'Mantenimiento de la red.',
+    startDate: '2019-03-01',
+    endDate: '2021-12-31',
+    technologies: [],
+    images: [],
+  },
+];
+
+// The detail of a project: three images by default (the cover first), no links and no dates.
+export function projectDetail(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
+  const base = projects[0]!;
+  return {
+    ...base,
+    description: 'Primer párrafo del proyecto.\n\nSegundo párrafo del proyecto.',
+    images: [base.cover!, cover('rucvm-2'), cover('rucvm-3')],
+    ...overrides,
+  };
+}
+
 export interface SiteData {
   profile: Profile;
   projects: ProjectSummary[];
   categories: Category[];
   skills: SkillGroup[];
   socialLinks: SocialLink[];
+  experiences: Experience[];
 }
 
 // Every public request of the home page, answered for one language.
 export function mockSite(overrides: Partial<SiteData> = {}, lang = 'es') {
-  const data: SiteData = { profile, projects, categories, skills, socialLinks, ...overrides };
+  const data: SiteData = {
+    profile,
+    projects,
+    categories,
+    skills,
+    socialLinks,
+    experiences,
+    ...overrides,
+  };
   return mockApi()
     .on(`GET /profile?lang=${lang}`, ok(data.profile))
     .on(`GET /projects?lang=${lang}`, ok(data.projects))
     .on(`GET /project-categories?lang=${lang}`, ok(data.categories))
+    .on(`GET /experiences?lang=${lang}`, ok(data.experiences))
     .on('GET /skills', ok(data.skills))
     .on('GET /social-links', ok(data.socialLinks));
 }

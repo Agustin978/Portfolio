@@ -5,6 +5,7 @@ import { PAGE_COLUMN } from '../../components/ui/layout';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { useProfile } from '../../hooks/queries';
 import { useAboutContent } from '../about/useAboutContent';
+import { useExperienceContent } from '../experience/useExperienceContent';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { SECTION_IDS, useSectionLink } from './sections';
 
@@ -13,11 +14,13 @@ export function Header() {
   const lang = useLang();
   const profile = useProfile(lang);
   const about = useAboutContent(lang);
+  const experience = useExperienceContent(lang);
   const sectionLink = useSectionLink();
 
   const links = [
     { id: SECTION_IDS.projects, label: t('nav.projects') },
     ...(about.visible ? [{ id: SECTION_IDS.about, label: t('nav.about') }] : []),
+    ...(experience.visible ? [{ id: SECTION_IDS.experience, label: t('nav.experience') }] : []),
     { id: SECTION_IDS.contact, label: t('nav.contact') },
   ];
 
