@@ -1,7 +1,9 @@
 import { useLayoutEffect } from 'react';
-import { Navigate, Outlet, useParams } from 'react-router';
+import { useParams } from 'react-router';
+import { SiteLayout } from '../features/layout/SiteLayout';
 import i18n from '../i18n';
-import { DEFAULT_LANGUAGE, isLanguage } from '../i18n/languages';
+import { isLanguage } from '../i18n/languages';
+import { RootRedirect } from './RootRedirect';
 
 export function LanguageLayout() {
   const { lang } = useParams();
@@ -12,6 +14,7 @@ export function LanguageLayout() {
     if (isLanguage(lang) && i18n.resolvedLanguage !== lang) void i18n.changeLanguage(lang);
   }, [lang]);
 
-  if (!isLanguage(lang)) return <Navigate to={`/${DEFAULT_LANGUAGE}`} replace />;
-  return <Outlet />;
+  // A first segment that is not a language (/fr, /proyectos) goes to the detected language.
+  if (!isLanguage(lang)) return <RootRedirect />;
+  return <SiteLayout />;
 }

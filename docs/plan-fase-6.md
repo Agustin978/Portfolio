@@ -367,6 +367,7 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 2. **`feature/dev-demo-content`.** Script `db:seed-demo` (sección 13), sus tests y la documentación.
 3. **`feature/client-foundation`.** Commits: `docs: content-map` · `chore: script typecheck en la raíz` (`npm run typecheck --workspaces --if-present`, con su script en cada workspace) · `chore(client): Vitest y Testing Library` (reemplaza el `echo` del script `test` del cliente) · `feat(client): apiClient, env y defaults de Query` · `feat(client): services y hooks de datos` · `feat(client): tokens, componentes UI y helpers (imageUrl, fechas, safeUrl, párrafos, errores)` · `feat(client): estructura de i18n con test de paridad`.
 4. **`feature/site-home`.** Layout con header, selector de idioma, footer, skip link, `ScrollRestoration`, 404 y aviso de lentitud; hero; sobre mí con skills y redes; proyectos con filtro y tarjetas.
+   - Las redes van donde las pone el canvas: en el panel de contacto (título, disponibilidad, correo y redes), que entra en este PR. El formulario se suma a ese panel en el PR 6. El enlace «Experiencia» del menú llega con su sección en el PR 5.
 5. **`feature/site-project-detail-experience`.** Página de detalle con galería y sección de experiencia.
 6. **`feature/site-contact`.** Formulario con honeypot, estados e íconos de redes; pasada de estados y responsive; actualización de `CLAUDE.md` y README; cierre de la fase.
 

@@ -1,13 +1,18 @@
-import { useTranslation } from 'react-i18next';
+import { AboutSection } from '../about/AboutSection';
+import { ContactSection } from '../contact/ContactSection';
+import { Hero } from '../hero/Hero';
+import { PageTitle } from '../layout/PageTitle';
+import { ProjectsSection } from '../projects/ProjectsSection';
 
-// Provisional page: presentational only, no data fetching.
+// Each section fetches its own data, so one failing never takes the others down.
 export function Home() {
-  const { t } = useTranslation();
-
   return (
-    <main className="mx-auto max-w-page px-6 py-24">
-      <h1 className="text-4xl font-semibold">{t('home.title')}</h1>
-      <p className="mt-4 text-muted">{t('home.subtitle')}</p>
-    </main>
+    <>
+      <PageTitle />
+      <Hero />
+      <ProjectsSection />
+      <AboutSection />
+      <ContactSection />
+    </>
   );
 }
