@@ -8,13 +8,14 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 - **Un campo opcional que llega `null` oculta su elemento completo**, sin etiquetas, separadores ni íconos huérfanos. Ejemplos: sin `cvUrl` no hay botón «Descargar CV»; sin `role` el eyebrow muestra solo `location` y sin el «·»; sin `companyUrl` la empresa va como texto.
 - Una sección que queda vacía (experiencia, skills, redes) se oculta con su enlace del menú. Proyectos muestra su mensaje de vacío.
 - El idioma de los datos sale de la URL (`/es`, `/en`), no del estado de i18n.
+- Las anclas de las secciones son las mismas en los dos idiomas (`#proyectos`, `#sobre-mi`, `#contacto`), así un enlace compartido como `/en#contacto` funciona.
 - Todo lo que viene de la API se renderiza como texto, nunca como HTML.
 
 ## Página y layout
 
 | Texto                                                      | Fuente                                                                                         |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `<title>`                                                  | i18n `meta.title` + `/profile` → `fullName`                                                    |
+| `<title>`                                                  | `{fullName} · {meta.title}`; en la 404, `{notFound.title} · {fullName} · {meta.title}`; sin perfil, solo `meta.title` |
 | «Saltar al contenido»                                      | i18n `nav.skip`                                                                                |
 | Logo «Agustín»                                             | `/profile` → `fullName`                                                                        |
 | Menú Proyectos / Sobre mí / Experiencia / Contacto         | i18n `nav.projects`, `nav.about`, `nav.experience`, `nav.contact`                              |
@@ -28,7 +29,7 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 | Texto                                   | Fuente                                                              |
 | --------------------------------------- | ------------------------------------------------------------------- |
 | «Desarrollador · San Miguel de Tucumán» | `/profile` → `role` · `location` (omite el que sea `null`)          |
-| H1                                      | `/profile` → `headline`                                             |
+| H1                                      | `/profile` → `headline`; si es `null`, `fullName` (la página necesita su h1; mientras carga o falla, un h1 oculto con `meta.title`) |
 | Bajada «Soy Agustín…»                   | `/profile` → `intro`                                                |
 | «Ver proyectos», «Contacto»             | i18n `hero.projects`, `hero.contact`                                |
 | «Descargar CV» (no está en el canvas)   | i18n `hero.cv`; enlace a `/profile` → `cvUrl`, solo si no es `null` |
@@ -38,7 +39,7 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 | Texto                                                    | Fuente                                                                                      |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | «Proyectos»                                              | i18n `projects.title`                                                                       |
-| Etiqueta del filtro («Filtrar proyectos por categoría»)  | i18n `projects.filterLabel`                                                                 |
+| Etiqueta del filtro («Filtrar proyectos por categoría»)  | i18n `projects.filterLabel`; el filtro aparece solo con dos o más categorías en uso         |
 | «Todos»                                                  | i18n `projects.all`                                                                         |
 | Chips Web / IA / Redes                                   | `/project-categories` → `name` (el `slug` va a `?category=`)                                |
 | Imagen de la tarjeta y su `alt`                          | `/projects` → `cover` (`url`, `width`, `height`, `alt`; si `alt` es `null`, se usa `title`) |
