@@ -28,9 +28,11 @@ async function fillForm(user = userEvent.setup()) {
   return user;
 }
 
-function renderContact({ lang = 'es', publicEmail = profile.publicEmail } = {}) {
+// The form is lazy-loaded: wait for its first field before using it.
+async function renderContact({ lang = 'es', publicEmail = profile.publicEmail } = {}) {
   const api = mockSite({ profile: { ...profile, publicEmail } }, lang);
   const view = renderSite(`/${lang}`);
+  await screen.findByLabelText(lang === 'en' ? 'Name' : 'Nombre', {}, { timeout: 5000 });
   return { api, ...view };
 }
 
@@ -39,7 +41,7 @@ const posts = (api: ReturnType<typeof mockSite>) =>
 
 describe('contact form', () => {
   it('labels every field and keeps the honeypot out of reach', async () => {
-    renderContact();
+    await renderContact();
     await screen.findByRole('link', { name: 'hola@example.com' });
 
     for (const label of ['Nombre', 'Email', 'Mensaje']) {
@@ -63,7 +65,7 @@ describe('contact form', () => {
   });
 
   it('validates a field when it loses focus, and links the error to it', async () => {
-    renderContact();
+    await renderContact();
     const user = userEvent.setup();
 
     await user.click(field('Nombre'));
@@ -88,7 +90,7 @@ describe('contact form', () => {
   });
 
   it('does not send an invalid form and focuses the first error', async () => {
-    const { api } = renderContact();
+    const { api } = await renderContact();
     const user = userEvent.setup();
     await user.type(field('Email'), 'no-es-un-email');
 
@@ -103,7 +105,7 @@ describe('contact form', () => {
 
   it('sends the trimmed values with the language of the URL, once, and confirms', async () => {
     let answer!: () => void;
-    const { api } = renderContact();
+    const { api } = await renderContact();
     api.on(
       POST,
       () =>
@@ -143,7 +145,7 @@ describe('contact form', () => {
   });
 
   it('sends lang "en" and speaks English on /en', async () => {
-    const { api } = renderContact({ lang: 'en' });
+    const { api } = await renderContact({ lang: 'en' });
     api.on(POST, received());
     const user = userEvent.setup();
     await user.type(field('Name'), 'Ana');
@@ -159,7 +161,7 @@ describe('contact form', () => {
   });
 
   it('keeps what was typed and offers a retry and the email after a network failure', async () => {
-    const { api } = renderContact();
+    const { api } = await renderContact();
     api.on(POST, networkError(), received());
     const user = await fillForm();
 
@@ -187,7 +189,7 @@ describe('contact form', () => {
   });
 
   it('offers the retry without the email line when there is no publicEmail', async () => {
-    const { api } = renderContact({ publicEmail: null });
+    const { api } = await renderContact({ publicEmail: null });
     api.on(POST, apiError(503, 'SERVICE_UNAVAILABLE'));
     const user = await fillForm();
 
@@ -202,7 +204,7 @@ describe('contact form', () => {
 
   it('shows the timeout with a retry', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    const { api } = renderContact();
+    const { api } = await renderContact();
     api.on(POST, hang);
     const user = await fillForm(userEvent.setup({ advanceTimers: vi.advanceTimersByTime }));
 
@@ -217,7 +219,7 @@ describe('contact form', () => {
   });
 
   it('shows a generic notice on 429, without retry or countdown', async () => {
-    const { api } = renderContact();
+    const { api } = await renderContact();
     api.on(POST, apiError(429, 'RATE_LIMITED'));
     const user = await fillForm();
 
@@ -235,7 +237,7 @@ describe('contact form', () => {
   });
 
   it('marks the fields the server rejects with a 400', async () => {
-    const { api } = renderContact();
+    const { api } = await renderContact();
     api.on(POST, apiError(400, 'VALIDATION_ERROR', { email: ['Invalid email address'] }));
     const user = await fillForm();
 
@@ -252,7 +254,7 @@ describe('contact form', () => {
   });
 
   it('counts the characters of the message', async () => {
-    renderContact();
+    await renderContact();
     await userEvent.type(field('Mensaje'), 'Doce letras.');
     expect(within(section()).getByText('12/5000')).toBeVisible();
   });

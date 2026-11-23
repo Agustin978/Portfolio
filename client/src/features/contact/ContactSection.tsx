@@ -10,7 +10,7 @@ import { useProfile, useSocialLinks } from '../../hooks/queries';
 import { canRetry, errorMessageKey } from '../../lib/apiErrors';
 import { mailtoHref, safeUrl } from '../../lib/safeUrl';
 import { SECTION_IDS } from '../layout/sections';
-import { ContactForm } from './ContactForm';
+import { LazyContactForm } from './LazyContactForm';
 
 const TITLE_ID = 'contact-title';
 
@@ -89,7 +89,7 @@ export function ContactSection() {
             )}
           </div>
           <div className="min-w-0">
-            <ContactForm mailto={mailto} email={profile.data?.publicEmail?.trim()} />
+            <LazyContactForm mailto={mailto} email={profile.data?.publicEmail?.trim()} />
           </div>
         </div>
       </div>
