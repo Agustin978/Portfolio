@@ -90,6 +90,15 @@ De dónde sale cada texto del diseño (`Portfolio.dc.html`) y de las pantallas q
 - `startedAt` con valor y `endedAt` `null`: «{inicio} — Actualidad» (i18n `experience.present`).
 - Ambas con valor: «{inicio} — {fin}».
 - Solo `endedAt` con valor: solo «{fin}».
+- Vale también para experiencia: cada fecha (mes y año) y «Actualidad» son unidades que no se cortan, y el guion va pegado a la primera fecha con un espacio no separable. El único salto posible es después del guion. En la columna de 140 px (la misma de las skills) cualquier rango queda en dos líneas, «MAR 2019 —» / «DIC 2021»; la unidad más ancha, «ACTUALIDAD», mide 83 px.
+
+**Reglas de la página y de la sección** (PR 5):
+
+- Experiencia va después de «Sobre mí», con su enlace en el menú en ese orden (`#experiencia`). Se oculta, enlace incluido, solo cuando la API responde una lista vacía; cargando o con error, queda (el error con su «Reintentar»).
+- Las `images` de una experiencia no se muestran: el diseño de la sección no las prevé.
+- `PROJECT_NOT_FOUND` muestra la 404 con `notFound.project`; cualquier otro error deja la página con su «Reintentar». Mientras carga o si falla, el h1 queda oculto con `projects.title`.
+- «← Proyectos»: si se llegó desde una tarjeta, vuelve en el historial (con filtro y scroll); si se abrió directo, enlaza a `/{lang}#proyectos`.
+- `<title>` del detalle: `{title} · {fullName} · {meta.title}`; en su 404, `{notFound.title} · {fullName} · {meta.title}`. Lo pone el `<title>` de React 19 de cada página, así que al volver a la Home queda el general (`{fullName} · {meta.title}`).
 
 ## Contacto
 

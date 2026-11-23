@@ -8,6 +8,8 @@ interface ResponsiveImageProps {
   sizes: string;
   // The detail cover is the page's largest element: eager and high priority. Everything else lazy.
   priority?: boolean;
+  // contain shows the whole picture (detail gallery); cover fills the frame (cards).
+  fit?: 'cover' | 'contain';
   className?: string;
 }
 
@@ -17,6 +19,7 @@ export function ResponsiveImage({
   alt,
   sizes,
   priority = false,
+  fit = 'cover',
   className = '',
 }: ResponsiveImageProps) {
   const { src, srcSet } = imageSources(image);
@@ -31,7 +34,7 @@ export function ResponsiveImage({
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       fetchPriority={priority ? 'high' : undefined}
-      className={`block h-full w-full object-cover ${className}`}
+      className={`block h-full w-full ${fit === 'contain' ? 'object-contain' : 'object-cover'} ${className}`}
     />
   );
 }

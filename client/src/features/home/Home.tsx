@@ -1,5 +1,6 @@
 import { AboutSection } from '../about/AboutSection';
 import { ContactSection } from '../contact/ContactSection';
+import { ExperienceSection } from '../experience/ExperienceSection';
 import { Hero } from '../hero/Hero';
 import { PageTitle } from '../layout/PageTitle';
 import { ProjectsSection } from '../projects/ProjectsSection';
@@ -12,6 +13,7 @@ export function Home() {
       <Hero />
       <ProjectsSection />
       <AboutSection />
+      <ExperienceSection />
       <ContactSection />
     </>
   );

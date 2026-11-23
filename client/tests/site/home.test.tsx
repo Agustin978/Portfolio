@@ -24,7 +24,7 @@ describe('home page', () => {
       within(nav())
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Proyectos', 'Sobre mí', 'Contacto']);
+    ).toEqual(['Proyectos', 'Sobre mí', 'Experiencia', 'Contacto']);
 
     // About: bio paragraphs and skills as a definition list.
     expect(await screen.findByText('Primer párrafo de la bio.')).toBeVisible();

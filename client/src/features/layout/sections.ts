@@ -7,6 +7,7 @@ export const SECTION_IDS = {
   main: 'contenido',
   projects: 'proyectos',
   about: 'sobre-mi',
+  experience: 'experiencia',
   contact: 'contacto',
 } as const;
 

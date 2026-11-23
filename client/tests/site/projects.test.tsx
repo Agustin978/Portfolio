@@ -5,8 +5,11 @@ import { apiError, hang, ok } from '../helpers/mockApi';
 import { categories, mockSite, projects, renderSite } from '../helpers/site';
 
 const filter = () => screen.getByRole('group', { name: 'Filtrar proyectos por categoría' });
+// Scoped to the section: experience entries are h3 too.
 const cardTitles = () =>
-  screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent);
+  within(screen.getByRole('region', { name: 'Proyectos' }))
+    .getAllByRole('heading', { level: 3 })
+    .map((heading) => heading.textContent);
 
 describe('projects section', () => {
   it('shows a card per project with its cover, chips and a uniquely named link', async () => {

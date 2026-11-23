@@ -369,6 +369,7 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 4. **`feature/site-home`.** Layout con header, selector de idioma, footer, skip link, `ScrollRestoration`, 404 y aviso de lentitud; hero; sobre mí con skills y redes; proyectos con filtro y tarjetas.
    - Las redes van donde las pone el canvas: en el panel de contacto (título, disponibilidad, correo y redes), que entra en este PR. El formulario se suma a ese panel en el PR 6. El enlace «Experiencia» del menú llega con su sección en el PR 5.
 5. **`feature/site-project-detail-experience`.** Página de detalle con galería y sección de experiencia.
+   - La imagen principal va en un marco 16:9 con `object-contain` (las capturas no se recortan); «Ver sitio» es la píldora oscura y «Ver código» la de borde. Las imágenes de experiencia no se muestran.
 6. **`feature/site-contact`.** Formulario con honeypot, estados e íconos de redes; pasada de estados y responsive; actualización de `CLAUDE.md` y README; cierre de la fase.
 
 ## 19. Node y npm entre computadoras
@@ -399,3 +400,4 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 - Fase 7: `patch` y multipart en `apiClient`, reordenamiento atómico de imágenes, panel.
 - Fase 8: SEO, prerender, autoalojar las fuentes Geist, auditoría de accesibilidad y Lighthouse, workflow de CI (lint, typecheck y tests con Postgres en cada PR) en una rama `chore/ci`.
 - Fase 9: `BASE_URL` y cookies entre dominios (`SameSite=None` y Safari), dominio propio de Resend, `_redirects` y CSP, `NODE_VERSION` (24.22.1) y ping de mantenimiento. Verificar en el primer deploy que el build no dependa de los scripts de instalación que npm 11.19.1 saltea (sección 21). Render requiere `HOST=0.0.0.0` en sus variables: la API escucha en `127.0.0.1` por defecto y, sin esa variable, Render no detecta el puerto y el deploy falla sin exponer nada (falla de forma segura).
+- Fase 9, enlaces directos: el sitio es una SPA, así que hay que verificar en Cloudflare Pages que un enlace directo o una recarga de una ruta profunda (`/es/projects/rucvm`, `/en`, una ruta inexistente) devuelve `index.html` y la app resuelve la ruta (incluida su 404). Si el host respondiera su propia 404 para rutas desconocidas, compartir el enlace de un proyecto o recargar el detalle fallaría. Se decide y se configura en esa fase (en la Fase 6 no se agrega ningún archivo de configuración del host).
