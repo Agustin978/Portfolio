@@ -83,6 +83,7 @@
       "emailInvalid": "Ingresá un email válido.",
       "messageTooShort": "El mensaje tiene que tener al menos {{min}} caracteres.",
       "messageTooLong": "El mensaje puede tener hasta {{max}} caracteres.",
+      "messageInvalid": "El mensaje tiene caracteres que no se pueden enviar.",
       "rateLimited": "Se enviaron demasiados mensajes desde esta conexión. Probá de nuevo más tarde."
     },
     "success": {
