@@ -198,9 +198,37 @@ describe('project detail', () => {
     await title();
     expect(router.state.location.pathname).toBe('/es/projects/rucvm');
 
+    await waitFor(() => expect(document.title).toBe('RUCVM · Agustín · Portfolio'));
+
     await userEvent.click(backLink());
     await waitFor(() => expect(router.state.location.pathname).toBe('/es'));
     expect(router.state.location.search).toBe('?category=web');
+    // Back on the home page, the general title again.
+    await waitFor(() => expect(document.title).toBe('Agustín · Portfolio'));
+    expect(document.querySelectorAll('title')).toHaveLength(1);
+  });
+
+  it('returns to the general title when leaving the 404 for the home page', async () => {
+    mockSite().on('GET /projects/no-existe?lang=es', apiError(404, 'PROJECT_NOT_FOUND'));
+    const { router } = renderSite('/es/projects/no-existe');
+    await waitFor(() => expect(document.title).toBe('Página no encontrada · Agustín · Portfolio'));
+
+    await userEvent.click(screen.getByRole('link', { name: 'Volver al inicio' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/es'));
+    await waitFor(() => expect(document.title).toBe('Agustín · Portfolio'));
+    expect(document.querySelectorAll('title')).toHaveLength(1);
+  });
+
+  it('titles the page in English too', async () => {
+    mockSite({}, 'en').on('GET /projects/rucvm?lang=en', ok(projectDetail()));
+    renderSite('/en/projects/rucvm');
+    await waitFor(() => expect(document.title).toBe('RUCVM · Agustín · Portfolio'));
+  });
+
+  it('titles the 404 of a project in English too', async () => {
+    mockSite({}, 'en').on('GET /projects/no-existe?lang=en', apiError(404, 'PROJECT_NOT_FOUND'));
+    renderSite('/en/projects/no-existe');
+    await waitFor(() => expect(document.title).toBe('Page not found · Agustín · Portfolio'));
   });
 
   it('keeps the project when switching language', async () => {
