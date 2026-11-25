@@ -78,6 +78,13 @@ npm run db:seed-demo -w server
 - **Recuperación:** única excepción a «no pisa nada». Un proyecto que existe, está en borrador, activo y sin ninguna imagen (lo que deja una corrida sin Cloudinary o una subida fallida) recibe sus imágenes y se publica en la siguiente corrida con Cloudinary. Un borrador con alguna imagen o desactivado no se toca.
 - Cada corrida con Cloudinary sube 6 imágenes y consume cuota gratuita.
 
+## Sitio público
+
+- `/es` y `/en`: Home con hero, proyectos (filtro en `?category=`), sobre mí con skills, experiencia y contacto. `/` redirige según el idioma del navegador.
+- `/es/projects/<slug>`: detalle del proyecto con galería. Un slug inexistente muestra la 404 propia.
+- Formulario de contacto: guarda el mensaje y manda el correo con Resend si está configurado. Sin las variables de Resend el mensaje se guarda igual, con el envío como `failed: not configured`. Cada envío real cuenta para el límite de 5 por hora por IP y para el tope de 50 correos por día.
+- Prueba manual del cierre de la Fase 6: [docs/prueba-manual-fase-6.md](docs/prueba-manual-fase-6.md).
+
 ## Comandos
 
 | Comando                | Qué hace                             |

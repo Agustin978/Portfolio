@@ -24,6 +24,8 @@
   /* Focus ring: dark on the page, light inside the dark panel (the dark one would not show). */
   --color-focus-ring: #18181b;
   --color-focus-ring-inverse: #fafaf9;
+  /* Error text and invalid-field borders on the dark panel: about 9:1 on #18181B. */
+  --color-danger-on-dark: #fca5a5;
 
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;

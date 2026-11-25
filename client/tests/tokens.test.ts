@@ -36,6 +36,9 @@ describe('token contrast', () => {
     ['bg', 'fg'],
     ['border-strong', 'fg'],
     ['bg', 'ink'],
+    ['danger-on-dark', 'fg'],
+    ['danger-on-dark', 'ink'],
+    ['border-hover', 'fg'],
   ])('text %s on %s reaches 4.5:1', (text, background) => {
     expect(contrast(text, background)).toBeGreaterThanOrEqual(4.5);
   });
@@ -45,6 +48,7 @@ describe('token contrast', () => {
     ['focus-ring', 'bg'],
     ['focus-ring', 'surface'],
     ['focus-ring-inverse', 'fg'],
+    ['danger-on-dark', 'ink'],
   ])('%s on %s reaches 3:1', (indicator, background) => {
     expect(contrast(indicator, background)).toBeGreaterThanOrEqual(3);
   });

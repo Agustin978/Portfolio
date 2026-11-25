@@ -83,6 +83,7 @@
       "emailInvalid": "Enter a valid email address.",
       "messageTooShort": "The message must be at least {{min}} characters long.",
       "messageTooLong": "The message can be up to {{max}} characters long.",
+      "messageInvalid": "The message has characters that cannot be sent.",
       "rateLimited": "Too many messages were sent from this connection. Please try again later."
     },
     "success": {
