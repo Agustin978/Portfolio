@@ -199,7 +199,7 @@ export function ContactForm({ mailto, email }: { mailto: string | null; email?: 
       {failure && (
         <div
           role="alert"
-          className="flex flex-col items-start gap-4 rounded-card border border-border-field p-5"
+          className="flex flex-col items-start gap-4 rounded-card border border-danger-on-dark p-5"
         >
           <p className="m-0 text-base leading-[1.6] text-bg">{t(errorMessageKey(failure))}</p>
           {retryable && (

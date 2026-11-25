@@ -258,4 +258,15 @@ describe('contact form', () => {
     await userEvent.type(field('Mensaje'), 'Doce letras.');
     expect(within(section()).getByText('12/5000')).toBeVisible();
   });
+
+  it('draws the error box with the error color, like the field errors', async () => {
+    const { api } = await renderContact();
+    api.on(POST, apiError(429, 'RATE_LIMITED'));
+    const user = await fillForm();
+    await user.click(submitButton());
+
+    const alert = await within(section()).findByRole('alert');
+    expect(alert).toHaveClass('border-danger-on-dark');
+    expect(alert).not.toHaveClass('border-border-field');
+  });
 });
