@@ -192,7 +192,16 @@ export function ContactForm({ mailto, email }: { mailto: string | null; email?: 
           aria-disabled={send.isPending}
           className={`${pillClassName('light')} aria-disabled:cursor-progress aria-disabled:opacity-70`}
         >
-          {send.isPending ? t('form.sending') : t('form.submit')}
+          {/* Both labels share one grid cell, so the button is as wide as the longer one in the
+              current language and does not jump when it switches; it scales with the font. */}
+          <span className="inline-grid justify-items-center">
+            <span className="col-start-1 row-start-1">
+              {send.isPending ? t('form.sending') : t('form.submit')}
+            </span>
+            <span aria-hidden="true" className="invisible col-start-1 row-start-1">
+              {send.isPending ? t('form.submit') : t('form.sending')}
+            </span>
+          </span>
         </button>
       </div>
 

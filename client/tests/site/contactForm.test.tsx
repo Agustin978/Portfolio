@@ -259,6 +259,31 @@ describe('contact form', () => {
     expect(within(section()).getByText('12/5000')).toBeVisible();
   });
 
+  it.each([
+    ['es', 'Enviar mensaje', 'Enviando…'],
+    ['en', 'Send message', 'Sending…'],
+  ] as const)(
+    'keeps the submit button as wide as its longer label (%s), so it does not jump',
+    async (lang, submit, sending) => {
+      const { api } = await renderContact({ lang });
+      api.on(POST, hang);
+      const button = within(section()).getByRole('button', { name: submit });
+      // The other label sits in the same grid cell, invisible and hidden from screen readers.
+      const reserve = () => button.querySelector('[aria-hidden="true"]')!;
+      expect(reserve()).toHaveTextContent(sending);
+      expect(reserve()).toHaveClass('invisible');
+
+      const user = userEvent.setup();
+      await user.type(field(lang === 'en' ? 'Name' : 'Nombre'), 'Ana');
+      await user.type(field('Email'), 'ana@example.com');
+      await user.type(field(lang === 'en' ? 'Message' : 'Mensaje'), 'Hola, ¿cómo va todo?');
+      await user.click(button);
+
+      expect(within(section()).getByRole('button', { name: sending })).toBe(button);
+      expect(reserve()).toHaveTextContent(submit);
+    },
+  );
+
   it('draws the error box with the error color, like the field errors', async () => {
     const { api } = await renderContact();
     api.on(POST, apiError(429, 'RATE_LIMITED'));
