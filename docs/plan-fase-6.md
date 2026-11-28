@@ -1,5 +1,7 @@
 # Plan de implementación: Fase 6, sitio público
 
+> **Estado: CERRADA (2026-11-28).** Prueba manual completa en es/en, 360/768/1280 px, teclado, lector de pantalla, API caída, 404 de proyecto y 429.
+
 Este documento es la fuente de verdad de la Fase 6. Si algo de lo que ves en el repositorio contradice este plan, no lo resuelvas por tu cuenta: anotalo en el reporte del Paso 0 y esperá instrucciones.
 
 ## 0. Reglas de trabajo
@@ -406,3 +408,7 @@ Seis PRs. Cada uno sale de `dev` actualizado, lleva sus tests y se aprueba por s
 - Fase 8: SEO, prerender, autoalojar las fuentes Geist, auditoría de accesibilidad y Lighthouse, workflow de CI (lint, typecheck y tests con Postgres en cada PR) en una rama `chore/ci`.
 - Fase 9: `BASE_URL` y cookies entre dominios (`SameSite=None` y Safari), dominio propio de Resend, `_redirects` y CSP, `NODE_VERSION` (24.22.1) y ping de mantenimiento. Verificar en el primer deploy que el build no dependa de los scripts de instalación que npm 11.19.1 saltea (sección 21). Render requiere `HOST=0.0.0.0` en sus variables: la API escucha en `127.0.0.1` por defecto y, sin esa variable, Render no detecta el puerto y el deploy falla sin exponer nada (falla de forma segura).
 - Fase 9, enlaces directos: el sitio es una SPA, así que hay que verificar en Cloudflare Pages que un enlace directo o una recarga de una ruta profunda (`/es/projects/rucvm`, `/en`, una ruta inexistente) devuelve `index.html` y la app resuelve la ruta (incluida su 404). Si el host respondiera su propia 404 para rutas desconocidas, compartir el enlace de un proyecto o recargar el detalle fallaría. Se decide y se configura en esa fase (en la Fase 6 no se agrega ningún archivo de configuración del host).
+- Fase 8: el aviso de Edge «Tracking Prevention blocked access to storage» para `res.cloudinary.com` es benigno (las imágenes cargan); confirmarlo en Chrome y Firefox durante la auditoría.
+- Fase 9: verificar `trust proxy` en Express detrás de Render. Sin eso, el límite de 5 envíos por hora por IP se contaría sobre la IP del proxy y todas las visitas compartirían el cupo. Probarlo con envíos reales en producción.
+- Fase 9: el límite de envíos es en memoria; se reinicia con cada arranque del server (aceptable).
+- Fase 9: el arranque en frío de Render va a ejercitar el aviso de lentitud de 4 s.
